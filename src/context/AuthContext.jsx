@@ -48,13 +48,17 @@ export function AuthProvider({ children }) {
       },
       async register(payload) {
         const { data } = await api.post('/api/auth/register', payload);
-        return data.data;
-      },
-      async verifyEmail(email, code) {
-        const { data } = await api.post('/api/auth/verify-email', { email, code });
         persistSession(data.data);
         setUser(data.data.user);
         return data.data.user;
+      },
+      async verifyEmail(email, code) {
+        const { data } = await api.post('/api/auth/verify-email', { email, code });
+        if (data?.data?.accessToken) {
+          persistSession(data.data);
+          setUser(data.data.user);
+        }
+        return data.data?.user;
       },
       async resendVerification(email) {
         const { data } = await api.post('/api/auth/resend-verification', { email });

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Eye, EyeOff, Lock, Mail, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getErrorMessage, getErrorCode } from '../lib/api';
+import { getErrorMessage } from '../lib/api';
 import AuthLayout from '../components/AuthLayout';
 
 export default function LoginPage() {
@@ -22,10 +22,6 @@ export default function LoginPage() {
       await login(email, password);
       navigate('/');
     } catch (err) {
-      if (getErrorCode(err) === 'EMAIL_NOT_VERIFIED') {
-        navigate(`/verify-email?email=${encodeURIComponent(email)}&resend=1`);
-        return;
-      }
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);

@@ -17,16 +17,12 @@ export default function RegisterPage() {
     setLoading(true);
     setError('');
     try {
-      const data = await register(form);
-      navigate(`/verify-email?email=${encodeURIComponent(data.email || form.email)}`);
+      await register(form);
+      navigate('/');
     } catch (err) {
       const code = getErrorCode(err);
       if (code === 'EMAIL_EXISTS') {
-        setError('This email is already registered and verified. Please log in.');
-        return;
-      }
-      if (code === 'EMAIL_NOT_VERIFIED' || code === 'RESEND_COOLDOWN') {
-        navigate(`/verify-email?email=${encodeURIComponent(form.email.trim().toLowerCase())}`);
+        setError('This email is already registered. Please log in.');
         return;
       }
       setError(getErrorMessage(err));
@@ -36,7 +32,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthLayout heading="Create Account" subheading="Verify your email with a 6-digit code to complete registration">
+    <AuthLayout heading="Create Account" subheading="Create your account to get started">
       <form onSubmit={onSubmit} className="space-y-4">
         {error ? (
           <div className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700">
@@ -94,10 +90,10 @@ export default function RegisterPage() {
         </div>
 
         <button className="btn btn-primary w-full py-3" disabled={loading}>
-          {loading ? 'Sending code…' : 'Continue'}
+          {loading ? 'Creating account…' : 'Create Account'}
         </button>
         <div className="text-center text-sm text-slate-500">
-          Already verified?{' '}
+          Already have an account?{' '}
           <Link to="/login" className="font-semibold text-[var(--wa-deep)]">
             Login
           </Link>
