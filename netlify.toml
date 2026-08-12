@@ -2,6 +2,11 @@
   command = "npm run build"
   publish = "dist"
 
+# Ensure production builds always target the Render API (even if Netlify UI env is empty)
+[build.environment]
+  VITE_API_URL = "https://whatsapp-bsp-api.onrender.com"
+  VITE_SOCKET_URL = "https://whatsapp-bsp-api.onrender.com"
+
 # React Router (BrowserRouter) — all paths serve index.html
 [[redirects]]
   from = "/*"
