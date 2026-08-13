@@ -25,6 +25,7 @@ import { useNotifications } from '../context/NotificationsContext';
 import { BrandLockup } from './Brand';
 import UserAvatar from './UserAvatar';
 import NotificationsBell from './NotificationsBell';
+import ThemeToggle from './ThemeToggle';
 
 function roleLabel(role) {
   if (role === 'admin') return 'Super Admin';
@@ -150,38 +151,39 @@ export default function AppLayout() {
       {open ? <div className="fixed inset-0 z-30 bg-black/40 lg:hidden" onClick={() => setOpen(false)} /> : null}
 
       <div className="min-w-0">
-        <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--line)] bg-white px-4 py-3 md:px-6">
+        <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--line)] bg-[var(--header)] px-4 py-3 md:px-6">
           <div className="flex shrink-0 items-center gap-3">
             <button className="btn btn-secondary !px-2.5" onClick={() => setOpen(true)}>
               <Menu size={18} />
             </button>
-            <h1 className="text-xl font-extrabold tracking-tight text-slate-900">{pageTitle}</h1>
+            <h1 className="text-xl font-extrabold tracking-tight text-[var(--ink)]">{pageTitle}</h1>
           </div>
 
           <div className="mx-auto hidden min-w-0 max-w-xl flex-1 md:block">
             <label className="relative block">
-              <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
               <input
-                className="h-10 w-full rounded-full border border-[var(--line)] bg-[#f8fafc] pl-10 pr-14 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-[var(--wa)] focus:bg-white focus:ring-2 focus:ring-[var(--wa)]/15"
+                className="h-10 w-full rounded-full border border-[var(--line)] bg-[var(--header-search)] pl-10 pr-14 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--wa)] focus:bg-[var(--panel)] focus:ring-2 focus:ring-[var(--wa)]/15"
                 placeholder="Search anything..."
                 aria-label="Search"
               />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-[var(--line)] bg-white px-1.5 py-0.5 text-[10px] font-bold text-slate-400">
+              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-[var(--line)] bg-[var(--panel)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--muted)]">
                 ⌘ K
               </span>
             </label>
           </div>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <ThemeToggle />
             <NotificationsBell />
             <Link to="/settings">
-              <div className="hidden sm:flex items-center gap-2 rounded-full border border-[var(--line)] bg-white pl-1 pr-3 py-1">
+              <div className="hidden sm:flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--panel)] pl-1 pr-3 py-1">
                 <UserAvatar user={user} size={32} />
                 <div className="leading-tight">
-                  <div className="text-sm font-bold text-slate-800">{user?.name}</div>
-                  <div className="text-[11px] font-semibold text-slate-400">{roleLabel(user?.role)}</div>
+                  <div className="text-sm font-bold text-[var(--ink)]">{user?.name}</div>
+                  <div className="text-[11px] font-semibold text-[var(--muted)]">{roleLabel(user?.role)}</div>
                 </div>
-                <ChevronDown size={14} className="text-slate-400" />
+                <ChevronDown size={14} className="text-[var(--muted)]" />
               </div>
             </Link>
           </div>
