@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Eye, Pause, Play, Plus, Rocket, RotateCcw, Send, XCircle } from 'lucide-react';
+import { Check, Eye, Pause, Play, Plus, Rocket, RotateCcw, Send, XCircle } from 'lucide-react';
 import { api, getErrorMessage } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 import { PageShell, IconAction } from '../components/PageShell';
 import { StatusBadge } from '../components/ui';
 
@@ -14,6 +15,7 @@ function formatWhen(value) {
 
 export default function CampaignsPage() {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
@@ -101,6 +103,21 @@ export default function CampaignsPage() {
                           <IconAction title="View" onClick={() => navigate(`/campaigns/${r.id}`)}>
                             <Eye size={14} />
                           </IconAction>
+                          {r.status === 'pending_approval' && isAdmin ? (
+                            <IconAction
+                              title="Approve"
+                              disabled={busy}
+                              onClick={() =>
+                                runAction(
+                                  r.id,
+                                  'approve',
+                                  'Approve this campaign and launch/schedule it?'
+                                )
+                              }
+                            >
+                              <Check size={14} />
+                            </IconAction>
+                          ) : null}
                           {['draft', 'scheduled'].includes(r.status) ? (
                             <IconAction
                               title="Launch now"

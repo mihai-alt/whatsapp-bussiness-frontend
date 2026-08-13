@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { api, getErrorMessage } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
 import { getSocket } from '../lib/socket';
 import { PageShell } from '../components/PageShell';
 import { StatusBadge, StatCard } from '../components/ui';
@@ -52,6 +53,7 @@ function formatWhen(value) {
 
 export default function CampaignDetailPage() {
   const { id } = useParams();
+  const { isAdmin } = useAuth();
   const [campaign, setCampaign] = useState(null);
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState('');
@@ -127,6 +129,7 @@ export default function CampaignDetailPage() {
   const canPause = ['running', 'queued', 'scheduled'].includes(campaign.status);
   const canResume = campaign.status === 'paused';
   const canLaunchNow = ['draft', 'scheduled'].includes(campaign.status);
+  const canApprove = isAdmin && campaign.status === 'pending_approval';
   const canCancel = !['completed', 'cancelled'].includes(campaign.status);
   const canRetry = Number(campaign.failed_count || 0) > 0 && campaign.status !== 'cancelled';
 
@@ -139,6 +142,17 @@ export default function CampaignDetailPage() {
       ]}
       actions={
         <div className="flex flex-wrap gap-2">
+          {canApprove ? (
+            <button
+              className="btn btn-primary"
+              disabled={!!busy}
+              onClick={() =>
+                window.confirm('Approve this campaign and launch/schedule it?') && action('approve')
+              }
+            >
+              {busy === 'approve' ? 'Approving…' : 'Approve'}
+            </button>
+          ) : null}
           {canLaunchNow ? (
             <button
               className="btn btn-primary"
@@ -179,6 +193,12 @@ export default function CampaignDetailPage() {
     >
       {error ? <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
 
+      {campaign.status === 'pending_approval' ? (
+        <div className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Waiting for admin approval before this campaign can send.
+          {isAdmin ? ' Use Approve when ready.' : ''}
+        </div>
+      ) : null}
       {campaign.status === 'paused' ? (
         <div className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Campaign Paused — remaining messages will not send until you resume.

@@ -25,6 +25,7 @@ import AdminWalletRechargesPage from './pages/AdminWalletRechargesPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import UsersPage from './pages/UsersPage';
+import AuditLogsPage from './pages/AuditLogsPage';
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ export default function App() {
                 <Route path="reports" element={<ReportsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="users" element={<UsersPage />} />
+                <Route path="audit-logs" element={<AuditLogsPage />} />
               </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

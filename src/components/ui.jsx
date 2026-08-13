@@ -4,7 +4,7 @@ export function StatusBadge({ status }) {
   let label = status;
   if (['approved', 'connected', 'completed', 'delivered', 'read', 'sent', 'ok', 'in progress'].includes(s) || s === 'running') {
     cls = s === 'running' || s === 'in progress' ? 'badge-warn' : 'badge-ok';
-  } else if (['pending', 'queued', 'scheduled', 'paused', 'draft'].includes(s)) {
+  } else if (['pending', 'queued', 'scheduled', 'paused', 'draft', 'pending_approval'].includes(s)) {
     cls = 'badge-warn';
   } else if (['rejected', 'failed', 'cancelled', 'disconnected', 'error'].includes(s)) {
     cls = 'badge-danger';
@@ -12,6 +12,7 @@ export function StatusBadge({ status }) {
     cls = 'badge-info';
   }
   if (s === 'running') label = 'In Progress';
+  if (s === 'pending_approval') label = 'Pending Approval';
   return <span className={`badge ${cls}`}>{label}</span>;
 }
 

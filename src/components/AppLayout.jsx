@@ -18,6 +18,7 @@ import {
   Search,
   History,
   Receipt,
+  ScrollText,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsContext';
@@ -45,6 +46,7 @@ const links = [
   { to: '/reports', label: 'Reports', icon: BarChart3 },
   { to: '/settings', label: 'Settings', icon: Settings },
   { to: '/users', label: 'Users', icon: UserRound, adminOnly: true },
+  { to: '/audit-logs', label: 'Audit Logs', icon: ScrollText, adminOnly: true },
 ];
 
 const titles = {
@@ -64,6 +66,7 @@ const titles = {
   '/settings': 'Settings',
   '/profile': 'Business Profile',
   '/users': 'Users',
+  '/audit-logs': 'Audit Logs',
 };
 
 export default function AppLayout() {
