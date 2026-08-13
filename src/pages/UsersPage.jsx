@@ -80,7 +80,7 @@ function StatusBadge({ active }) {
 function Modal({ title, subtitle, onClose, children, footer }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button type="button" className="absolute inset-0 bg-slate-900/40" aria-label="Close" onClick={onClose} />
+      <button type="button" className="absolute inset-0 bg-black/50" aria-label="Close" onClick={onClose} />
       <div className="relative w-full max-w-lg rounded-2xl border border-[var(--line)] bg-white shadow-xl">
         <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] px-5 py-4">
           <div>
@@ -235,7 +235,7 @@ export default function UsersPage() {
   }
 
   const fieldClass =
-    'h-11 w-full rounded-xl border border-[var(--line)] bg-white px-3 text-sm text-slate-800 outline-none transition focus:border-[var(--wa)] focus:ring-2 focus:ring-[var(--wa)]/15';
+    'h-11 w-full rounded-xl border border-[var(--line)] bg-[var(--panel)] px-3 text-sm text-[var(--ink)] outline-none transition focus:border-[var(--wa)] focus:ring-2 focus:ring-[var(--wa)]/15';
   const selectClass = `${fieldClass} appearance-none pr-8`;
 
   return (
@@ -319,7 +319,7 @@ export default function UsersPage() {
           <>
             <div className="min-h-0 flex-1 overflow-auto">
               <table className="min-w-full text-sm">
-                <thead className="sticky top-0 bg-[#f8fafc] text-left text-slate-400">
+                <thead className="sticky top-0 bg-[var(--panel-2)] text-left text-slate-400">
                   <tr>
                     {['User', 'Email', 'Role', 'Status', 'Created At', 'Actions'].map((h) => (
                       <th key={h} className="px-5 py-3 font-bold whitespace-nowrap">

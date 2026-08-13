@@ -11,6 +11,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { BrandLockup, WhatsAppMark } from './Brand';
+import ThemeToggle from './ThemeToggle';
 
 const previewNav = [
   LayoutDashboard,
@@ -24,13 +25,14 @@ const previewNav = [
 
 export default function AuthLayout({ children, heading, subheading }) {
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 bg-white">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-[var(--panel)]">
       <div className="flex flex-col justify-center px-6 py-10 sm:px-12 lg:px-16 xl:px-24">
-        <div className="mb-8">
+        <div className="mb-8 flex items-center justify-between gap-3">
           <BrandLockup />
+          <ThemeToggle />
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">{heading}</h1>
-        <p className="mt-2 text-slate-500">{subheading}</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-[var(--ink)]">{heading}</h1>
+        <p className="mt-2 text-[var(--muted)]">{subheading}</p>
         <div className="mt-8 max-w-md">{children}</div>
       </div>
 
@@ -58,7 +60,7 @@ export default function AuthLayout({ children, heading, subheading }) {
                   </div>
                 ))}
               </div>
-              <div className="p-4 bg-[#f7faf8]">
+              <div className="bg-[var(--panel-2)] p-4">
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     ['Connected Number', '+91 98765 43210'],
@@ -66,24 +68,24 @@ export default function AuthLayout({ children, heading, subheading }) {
                     ['Messages Sent Today', '1,248'],
                     ['Delivered', '1,190'],
                   ].map(([label, value]) => (
-                    <div key={label} className="rounded-xl bg-white border border-[var(--line)] p-3">
-                      <div className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">{label}</div>
-                      <div className="mt-1 text-sm font-bold text-slate-800">{value}</div>
+                    <div key={label} className="rounded-xl border border-[var(--line)] bg-[var(--panel)] p-3">
+                      <div className="text-[10px] font-semibold uppercase tracking-wide text-[var(--faint)]">{label}</div>
+                      <div className="mt-1 text-sm font-bold text-[var(--ink)]">{value}</div>
                       <div className="mt-2 h-6 rounded bg-gradient-to-r from-emerald-100 to-transparent" />
                     </div>
                   ))}
                 </div>
-                <div className="mt-3 rounded-xl bg-white border border-[var(--line)] p-3">
+                <div className="mt-3 rounded-xl border border-[var(--line)] bg-[var(--panel)] p-3">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm font-bold">Recent Campaigns</div>
-                    <Link to="/login" className="text-xs font-semibold text-[var(--wa-deep)] pointer-events-none">
+                    <div className="text-sm font-bold text-[var(--ink)]">Recent Campaigns</div>
+                    <Link to="/login" className="pointer-events-none text-xs font-semibold text-[var(--wa-deep)]">
                       View All Campaigns
                     </Link>
                   </div>
                   <div className="mt-3 space-y-2">
                     {['Summer Sale Blast', 'Order Updates', 'Welcome Series'].map((name) => (
                       <div key={name} className="flex items-center justify-between text-xs">
-                        <span className="font-medium text-slate-700">{name}</span>
+                        <span className="font-medium text-[var(--ink-soft)]">{name}</span>
                         <span className="badge badge-ok">Completed</span>
                       </div>
                     ))}
@@ -94,14 +96,14 @@ export default function AuthLayout({ children, heading, subheading }) {
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-10 flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 shadow-sm border border-[var(--line)]">
+        <div className="absolute bottom-8 left-10 flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--panel)]/90 px-3 py-2 shadow-sm">
           <MessageCircle size={16} className="text-[var(--wa)]" />
-          <span className="text-xs font-semibold text-slate-600">Official Meta Cloud API ready</span>
+          <span className="text-xs font-semibold text-[var(--muted)]">Official Meta Cloud API ready</span>
         </div>
-        <div className="absolute right-12 top-16 grid h-12 w-12 place-items-center rounded-2xl bg-white shadow-md border border-[var(--line)]">
+        <div className="absolute right-12 top-16 grid h-12 w-12 place-items-center rounded-2xl border border-[var(--line)] bg-[var(--panel)] shadow-md">
           <Phone className="text-[var(--wa)]" size={20} />
         </div>
-        <div className="absolute right-24 bottom-28 grid h-12 w-12 place-items-center rounded-2xl bg-white shadow-md border border-[var(--line)]">
+        <div className="absolute right-24 bottom-28 grid h-12 w-12 place-items-center rounded-2xl border border-[var(--line)] bg-[var(--panel)] shadow-md">
           <BarChart3 className="text-[var(--wa-deep)]" size={20} />
         </div>
       </div>

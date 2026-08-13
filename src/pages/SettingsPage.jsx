@@ -75,10 +75,10 @@ function IconField({ icon: Icon, children, className = '' }) {
 }
 
 const inputClass =
-  'h-11 w-full rounded-xl border border-[var(--line)] bg-white pl-10 pr-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[var(--wa)] focus:ring-2 focus:ring-[var(--wa)]/15';
+  'h-11 w-full rounded-xl border border-[var(--line)] bg-[var(--panel)] pl-10 pr-3 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--faint)] focus:border-[var(--wa)] focus:ring-2 focus:ring-[var(--wa)]/15';
 const selectClass = `${inputClass} appearance-none pr-9`;
 const textareaClass =
-  'min-h-[110px] w-full resize-y rounded-xl border border-[var(--line)] bg-white py-3 pl-10 pr-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-[var(--wa)] focus:ring-2 focus:ring-[var(--wa)]/15';
+  'min-h-[110px] w-full resize-y rounded-xl border border-[var(--line)] bg-[var(--panel)] py-3 pl-10 pr-3 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--faint)] focus:border-[var(--wa)] focus:ring-2 focus:ring-[var(--wa)]/15';
 
 function emptyForm(user) {
   return {

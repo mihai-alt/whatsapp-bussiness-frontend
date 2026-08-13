@@ -99,7 +99,7 @@ export default function AdminWalletRechargesPage() {
           <>
             <div className="flex-1 overflow-x-auto">
               <table className="min-w-full text-sm">
-                <thead className="bg-[#f8fafc] text-left text-slate-400">
+                <thead className="bg-[var(--panel-2)] text-left text-slate-400">
                   <tr>
                     <th className="px-5 py-3.5 font-bold whitespace-nowrap">Recharge ID</th>
                     <th className="px-5 py-3.5 font-bold whitespace-nowrap">Amount</th>

@@ -20,8 +20,8 @@ export function PageHeader({ title, subtitle, actions }) {
   return (
     <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
+        <h1 className="text-2xl font-extrabold tracking-tight text-[var(--ink)]">{title}</h1>
+        {subtitle ? <p className="mt-1 text-sm text-[var(--muted)]">{subtitle}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
     </div>
@@ -31,17 +31,17 @@ export function PageHeader({ title, subtitle, actions }) {
 export function StatCard({ label, value, hint }) {
   return (
     <div className="card p-4">
-      <div className="text-xs font-bold uppercase tracking-wide text-slate-400">{label}</div>
-      <div className="mt-2 text-2xl font-extrabold text-slate-900">{value}</div>
-      {hint ? <div className="mt-1 text-xs text-slate-500">{hint}</div> : null}
+      <div className="text-xs font-bold uppercase tracking-wide text-[var(--faint)]">{label}</div>
+      <div className="mt-2 text-2xl font-extrabold text-[var(--ink)]">{value}</div>
+      {hint ? <div className="mt-1 text-xs text-[var(--muted)]">{hint}</div> : null}
     </div>
   );
 }
 
 export function EmptyState({ title, body }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 p-8 text-center text-slate-500">
-      <div className="font-bold text-slate-800">{title}</div>
+    <div className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--panel-2)] p-8 text-center text-[var(--muted)]">
+      <div className="font-bold text-[var(--ink)]">{title}</div>
       {body ? <p className="mt-2 text-sm">{body}</p> : null}
     </div>
   );

@@ -127,7 +127,7 @@ export default function DashboardPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-[#f8fafc] text-left text-slate-400">
+              <thead className="bg-[var(--panel-2)] text-left text-slate-400">
                 <tr>
                   <th className="px-4 py-3 font-bold">Campaign Name</th>
                   <th className="px-4 py-3 font-bold">Sent</th>

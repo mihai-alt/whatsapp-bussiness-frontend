@@ -268,7 +268,7 @@ export default function GroupsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="bg-[#f8fafc] text-left text-slate-400">
+              <thead className="bg-[var(--panel-2)] text-left text-slate-400">
                 <tr>
                   <th className="px-5 py-3.5 font-bold whitespace-nowrap">Group Name</th>
                   <th className="px-5 py-3.5 font-bold whitespace-nowrap">Contacts</th>
@@ -339,7 +339,7 @@ export default function GroupsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button
             type="button"
-            className="absolute inset-0 bg-slate-900/40"
+            className="absolute inset-0 bg-black/50"
             aria-label="Close"
             onClick={closeCreate}
           />
@@ -456,7 +456,7 @@ export default function GroupsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button
             type="button"
-            className="absolute inset-0 bg-slate-900/40"
+            className="absolute inset-0 bg-black/50"
             aria-label="Close"
             onClick={closeAccess}
           />

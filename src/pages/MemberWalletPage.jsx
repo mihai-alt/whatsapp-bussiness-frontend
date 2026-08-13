@@ -41,7 +41,7 @@ function statusLabel(status) {
 function Modal({ title, subtitle, onClose, children, footer, wide }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button type="button" className="absolute inset-0 bg-slate-900/40" aria-label="Close" onClick={onClose} />
+      <button type="button" className="absolute inset-0 bg-black/50" aria-label="Close" onClick={onClose} />
       <div
         className={`relative w-full rounded-2xl border border-[var(--line)] bg-white shadow-xl ${
           wide ? 'max-w-xl' : 'max-w-lg'

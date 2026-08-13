@@ -326,7 +326,7 @@ export default function CampaignDetailPage() {
           <div className="border-b border-[var(--line)] px-4 py-3 font-extrabold">Recent Messages</div>
           <div className="max-h-[360px] overflow-x-auto">
             <table className="min-w-full text-sm">
-              <thead className="sticky top-0 bg-[#f8fafc] text-left text-slate-400">
+              <thead className="sticky top-0 bg-[var(--panel-2)] text-left text-slate-400">
                 <tr>
                   <th className="px-4 py-3 font-bold">Phone</th>
                   <th className="px-4 py-3 font-bold">Status</th>
@@ -360,7 +360,7 @@ export default function CampaignDetailPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <button
             type="button"
-            className="absolute inset-0 bg-slate-900/40"
+            className="absolute inset-0 bg-black/50"
             aria-label="Close"
             onClick={() => setConfirmCancel(false)}
           />

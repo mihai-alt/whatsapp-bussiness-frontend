@@ -180,7 +180,7 @@ export default function AdminWalletTransactionsPage() {
           <>
             <div className="min-h-0 flex-1 overflow-auto">
               <table className="min-w-full text-sm">
-                <thead className="sticky top-0 bg-[#f8fafc] text-left text-slate-400">
+                <thead className="sticky top-0 bg-[var(--panel-2)] text-left text-slate-400">
                   <tr>
                     <th className="px-5 py-3 font-bold whitespace-nowrap">ID</th>
                     <th className="px-5 py-3 font-bold whitespace-nowrap">Type</th>

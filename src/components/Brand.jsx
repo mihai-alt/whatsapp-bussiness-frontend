@@ -19,10 +19,10 @@ export function BrandLockup({ light = false, compact = false }) {
     <div className="flex items-center gap-2.5">
       <WhatsAppMark size={compact ? 28 : 34} />
       <div className="leading-tight">
-        <div className={`font-extrabold ${light ? 'text-white' : 'text-slate-900'} ${compact ? 'text-sm' : 'text-base'}`}>
+        <div className={`font-extrabold ${light ? 'text-white' : 'text-[var(--ink)]'} ${compact ? 'text-sm' : 'text-base'}`}>
           WhatsApp Business
         </div>
-        <div className={`font-semibold ${light ? 'text-slate-300' : 'text-slate-500'} ${compact ? 'text-xs' : 'text-sm'}`}>
+        <div className={`font-semibold ${light ? 'text-slate-300' : 'text-[var(--muted)]'} ${compact ? 'text-xs' : 'text-sm'}`}>
           BSP Dashboard
         </div>
       </div>

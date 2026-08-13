@@ -62,7 +62,7 @@ export default function CampaignsPage() {
       <div className="card flex min-h-[calc(100vh-11.5rem)] flex-col overflow-hidden">
         <div className="flex min-h-0 flex-1 flex-col overflow-x-auto">
           <table className="min-w-full flex-1 text-sm">
-            <thead className="bg-[#f8fafc] text-left text-slate-400">
+            <thead className="bg-[var(--panel-2)] text-left text-slate-400">
               <tr>
                 <th className="px-5 py-3.5 font-bold whitespace-nowrap">Campaign Name</th>
                 <th className="px-5 py-3.5 font-bold whitespace-nowrap">Status</th>

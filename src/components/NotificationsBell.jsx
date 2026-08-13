@@ -102,8 +102,8 @@ export default function NotificationsBell() {
     >
       <button
         type="button"
-        className={`relative grid h-10 w-10 place-items-center rounded-full border border-[var(--line)] bg-white text-slate-600 transition hover:bg-slate-50 ${
-          open ? 'bg-slate-50 ring-2 ring-[var(--wa)]/15' : ''
+        className={`relative grid h-10 w-10 place-items-center rounded-full border border-[var(--line)] bg-[var(--panel)] text-[var(--muted)] transition hover:bg-[var(--panel-2)] ${
+          open ? 'bg-[var(--panel-2)] ring-2 ring-[var(--wa)]/15' : ''
         }`}
         onClick={() => {
           if (open) setOpen(false);
@@ -122,24 +122,24 @@ export default function NotificationsBell() {
 
       {open ? (
         <div
-          className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(92vw,360px)] overflow-hidden rounded-b-md border border-t-0 border-[var(--line)] bg-white shadow-[0_12px_40px_rgba(15,23,42,0.18)]"
+          className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(92vw,360px)] overflow-hidden rounded-b-md border border-t-0 border-[var(--line)] bg-[var(--panel)] shadow-[0_12px_40px_rgba(15,23,42,0.18)]"
           onMouseEnter={clearCloseTimer}
           onMouseLeave={scheduleHide}
         >
           <div className="border-b border-[var(--line)] px-4 py-3">
-            <div className="text-[15px] font-bold text-slate-900">Notifications</div>
+            <div className="text-[15px] font-bold text-[var(--ink)]">Notifications</div>
           </div>
 
           <div className="max-h-[320px] overflow-y-auto">
             {loading && !items.length ? (
-              <div className="px-4 py-10 text-center text-sm text-slate-400">Loading…</div>
+              <div className="px-4 py-10 text-center text-sm text-[var(--muted)]">Loading…</div>
             ) : !items.length ? (
               <div className="flex flex-col items-center px-6 py-12 text-center">
                 <div className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-[#e8faf0]">
                   <Bell size={20} className="text-[var(--wa)]" />
                 </div>
-                <div className="text-sm font-bold text-slate-900">No notifications yet</div>
-                <p className="mt-1 text-xs text-slate-500">
+                <div className="text-sm font-bold text-[var(--ink)]">No notifications yet</div>
+                <p className="mt-1 text-xs text-[var(--muted)]">
                   New alerts will appear here and stay in your history.
                 </p>
               </div>
@@ -150,7 +150,7 @@ export default function NotificationsBell() {
                   return (
                     <li
                       key={n.id}
-                      className="flex cursor-default gap-3 border-b border-[var(--line)] px-4 py-3 last:border-b-0 hover:bg-slate-50"
+                      className="flex cursor-default gap-3 border-b border-[var(--line)] px-4 py-3 last:border-b-0 hover:bg-[var(--panel-2)]"
                     >
                       <div
                         className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-md ${tone}`}
@@ -158,16 +158,16 @@ export default function NotificationsBell() {
                         <Icon size={16} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="text-[13px] leading-snug text-slate-800">
-                          <span className="font-semibold text-slate-900">{n.title}</span>
+                        <div className="text-[13px] leading-snug text-[var(--ink-soft)]">
+                          <span className="font-semibold text-[var(--ink)]">{n.title}</span>
                           {n.body ? (
                             <>
                               {': '}
-                              <span className="text-slate-600">{n.body}</span>
+                              <span className="text-[var(--muted)]">{n.body}</span>
                             </>
                           ) : null}
                         </div>
-                        <div className="mt-1 text-[11px] text-slate-400">{timeAgo(n.created_at)}</div>
+                        <div className="mt-1 text-[11px] text-[var(--faint)]">{timeAgo(n.created_at)}</div>
                       </div>
                     </li>
                   );
