@@ -2,10 +2,10 @@
   command = "npm run build"
   publish = "dist"
 
-# Production API (Render). Keep in sync with Netlify UI env vars.
+# Ensure production builds always target the Render API (even if Netlify UI env is empty)
 [build.environment]
-  VITE_API_URL = "https://whatsapp-bussiness-platform-pgab.onrender.com"
-  VITE_SOCKET_URL = "https://whatsapp-bussiness-platform-pgab.onrender.com"
+  VITE_API_URL = "https://whatsapp-bussiness-backend-vi5b.onrender.com"
+  VITE_SOCKET_URL = "https://whatsapp-bussiness-backend-vi5b.onrender.com"
 
 # React Router (BrowserRouter) — all paths serve index.html
 [[redirects]]
