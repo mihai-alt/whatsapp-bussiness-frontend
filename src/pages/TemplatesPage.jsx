@@ -16,6 +16,7 @@ import {
 import { api, getErrorMessage } from '../lib/api';
 import { PageShell, IconAction } from '../components/PageShell';
 import { StatusBadge } from '../components/ui';
+import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
 
 const PAGE_SIZE = 10;
 
@@ -246,6 +247,10 @@ export default function TemplatesPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, status, query]);
+
+  useWorkspaceRealtime(['templates'], () =>
+    loadList({ page, status, query }).catch((err) => setError(getErrorMessage(err)))
+  );
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);

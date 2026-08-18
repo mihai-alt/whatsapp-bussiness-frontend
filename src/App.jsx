@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { NotificationsProvider } from './context/NotificationsContext';
+import { WorkspaceRealtimeProvider } from './context/WorkspaceRealtimeContext';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AppLayout from './components/AppLayout';
@@ -36,6 +37,7 @@ export default function App() {
       <ThemeProvider>
         <AuthProvider>
           <NotificationsProvider>
+            <WorkspaceRealtimeProvider>
             <BrowserRouter>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
@@ -68,6 +70,7 @@ export default function App() {
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </BrowserRouter>
+            </WorkspaceRealtimeProvider>
           </NotificationsProvider>
         </AuthProvider>
       </ThemeProvider>

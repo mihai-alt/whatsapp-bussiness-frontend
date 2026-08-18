@@ -5,6 +5,7 @@ import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { PageShell, IconAction } from '../components/PageShell';
 import { StatusBadge } from '../components/ui';
+import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
 
 function formatWhen(value) {
   if (!value) return '—';
@@ -33,6 +34,10 @@ export default function CampaignsPage() {
       .catch((err) => setError(getErrorMessage(err)))
       .finally(() => setLoading(false));
   }, [load]);
+
+  useWorkspaceRealtime(['campaigns'], () =>
+    load().catch((err) => setError(getErrorMessage(err)))
+  );
 
   async function runAction(id, action, confirmText) {
     if (confirmText && !window.confirm(confirmText)) return;

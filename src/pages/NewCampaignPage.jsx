@@ -16,6 +16,7 @@ import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { PageShell } from '../components/PageShell';
 import { StatusBadge } from '../components/ui';
+import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
 
 const STEPS = [
   { key: 'details', label: 'Details', hint: 'Campaign details' },
@@ -280,6 +281,31 @@ export default function NewCampaignPage() {
       .then((res) => setTemplates(res.data.data || []))
       .catch((err) => setError(getErrorMessage(err)));
   }, [form.whatsappAccountId]);
+
+  useWorkspaceRealtime(['groups'], () => {
+    api
+      .get('/api/contacts/groups/available')
+      .then((res) => {
+        const next = res.data.data || [];
+        setGroups(next);
+        setForm((f) => {
+          if (!f.contactGroupId) return f;
+          const stillVisible = next.some((g) => String(g.id) === String(f.contactGroupId));
+          return stillVisible ? f : { ...f, contactGroupId: '' };
+        });
+      })
+      .catch(() => {});
+  });
+
+  useWorkspaceRealtime(['templates'], () => {
+    if (!form.whatsappAccountId) return;
+    api
+      .get('/api/templates', {
+        params: { status: 'APPROVED', accountId: form.whatsappAccountId },
+      })
+      .then((res) => setTemplates(res.data.data || []))
+      .catch(() => {});
+  });
 
   const selectedAccount = useMemo(
     () => accounts.find((a) => String(a.id) === String(form.whatsappAccountId)),

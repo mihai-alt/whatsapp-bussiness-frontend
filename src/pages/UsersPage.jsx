@@ -13,6 +13,7 @@ import {
 import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { mediaUrl } from '../lib/media';
+import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
 
 const PAGE_SIZE = 5;
 
@@ -125,6 +126,12 @@ export default function UsersPage() {
     if (!isAdmin) return;
     loadUsers().catch((err) => setError(getErrorMessage(err)));
   }, [isAdmin, loadUsers]);
+
+  useWorkspaceRealtime(
+    ['users'],
+    () => loadUsers().catch((err) => setError(getErrorMessage(err))),
+    { enabled: isAdmin }
+  );
 
   useEffect(() => {
     setPage(1);

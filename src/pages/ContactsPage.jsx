@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import { Download, Pencil, Plus, Search, Trash2, Upload, X } from 'lucide-react';
 import { api, getErrorMessage } from '../lib/api';
 import { PageShell, DataTable, IconAction } from '../components/PageShell';
 import { StatCard } from '../components/ui';
+import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
 
 const emptyForm = { name: '', phone: '', email: '', groupIds: [] };
 
@@ -77,16 +78,19 @@ export default function ContactsPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [saving, setSaving] = useState(false);
+  const filtersRef = useRef({ search: '', groupId: '' });
+  filtersRef.current = { search, groupId };
 
-  async function load() {
-    const params = { search, groupId: groupId || undefined };
+  const load = useCallback(async () => {
+    const { search: q, groupId: gId } = filtersRef.current;
+    const params = { search: q, groupId: gId || undefined };
     const [c, g] = await Promise.all([
       api.get('/api/contacts', { params }),
       api.get('/api/contacts/groups/available'),
     ]);
     setData(c.data.data);
     setGroups(g.data.data || []);
-  }
+  }, []);
 
   // Server returns only ACTIVE groups the user can use (owned + shared)
   const manageableGroups = useMemo(
@@ -96,7 +100,11 @@ export default function ContactsPage() {
 
   useEffect(() => {
     load().catch((err) => setError(getErrorMessage(err)));
-  }, [groupId]);
+  }, [groupId, load]);
+
+  useWorkspaceRealtime(['contacts', 'groups'], () =>
+    load().catch((err) => setError(getErrorMessage(err)))
+  );
 
   function openAdd() {
     setEditing(null);

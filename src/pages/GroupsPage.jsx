@@ -1,8 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FolderOpen, Lock, Pencil, Plus, Share2, Trash2, Users, X } from 'lucide-react';
 import { api, getErrorMessage } from '../lib/api';
 import { PageShell, IconAction } from '../components/PageShell';
 import { useAuth } from '../context/AuthContext';
+import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
+
+function isSiteAdmin(person) {
+  const role = String(person?.role || person?.user_role || '').toLowerCase();
+  return role === 'admin' || person?.is_admin === true;
+}
+
+function asMemberList(list) {
+  return (list || []).filter((person) => !isSiteAdmin(person));
+}
 
 function StatusBadge({ status }) {
   const active = String(status || 'ACTIVE').toUpperCase() === 'ACTIVE';
@@ -27,8 +37,10 @@ function AccessBadge({ mode }) {
         {shared ? 'Shared' : 'Private'}
       </span>
       {shared ? (
-        <span className="font-normal text-slate-400">All Members can view &amp; use</span>
-      ) : null}
+        <span className="font-normal text-slate-400">All Members</span>
+      ) : (
+        <span className="font-normal text-slate-400">Owner + invited Members</span>
+      )}
     </span>
   );
 }
@@ -52,18 +64,50 @@ export default function GroupsPage() {
   const [saving, setSaving] = useState(false);
   const [accessSaving, setAccessSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const accessGroupRef = useRef(null);
+  accessGroupRef.current = accessGroup;
 
-  async function load() {
+  const addableMembers = useMemo(() => asMemberList(shareable), [shareable]);
+  const invitedMembers = useMemo(() => asMemberList(accessUsers), [accessUsers]);
+  const invitedAdmins = useMemo(() => (accessUsers || []).filter(isSiteAdmin), [accessUsers]);
+
+  function canManageGroupMembers(group) {
+    if (!group) return false;
+    if (group.can_manage_access) return true;
+    // Non-admin owners can always add/remove site members (except admins).
+    return Boolean(group.is_owner) && !isAdmin;
+  }
+
+  const load = useCallback(async () => {
     const { data } = await api.get('/api/contacts/groups/list');
     setGroups(data.data || []);
-  }
+  }, []);
 
   useEffect(() => {
     setLoading(true);
     load()
       .catch((err) => setError(getErrorMessage(err)))
       .finally(() => setLoading(false));
-  }, []);
+  }, [load]);
+
+  useWorkspaceRealtime(['groups'], async () => {
+    try {
+      await load();
+      const open = accessGroupRef.current;
+      if (open?.id) {
+        try {
+          const { data } = await api.get(`/api/contacts/groups/${open.id}/access`);
+          setAccessUsers(data.data?.users || []);
+          setShareable(data.data?.shareable || []);
+        } catch {
+          // Group may have been deleted or access lost — close modal
+          setAccessGroup(null);
+        }
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
+    }
+  });
 
   function openCreate() {
     setEditing(null);
@@ -131,7 +175,7 @@ export default function GroupsPage() {
   }
 
   async function openAccess(group) {
-    if (!group.can_manage_access) return;
+    if (!canManageGroupMembers(group)) return;
     setAccessError('');
     setGrantUserId('');
     setAccessGroup(group);
@@ -154,32 +198,72 @@ export default function GroupsPage() {
     setAccessError('');
   }
 
-  async function ensureSharedThenGrant() {
+  async function grantMemberAccess() {
     if (!accessGroup) return;
+    if (!grantUserId) {
+      setAccessError('Select a member to add');
+      return;
+    }
+    const selected = addableMembers.find((u) => String(u.id) === String(grantUserId));
+    if (!selected || isSiteAdmin(selected)) {
+      setAccessError('Admins cannot be added to a group');
+      return;
+    }
     setAccessSaving(true);
     setAccessError('');
     try {
-      let group = accessGroup;
-      if (String(group.access_mode).toUpperCase() !== 'SHARED') {
-        const { data } = await api.patch(`/api/contacts/groups/${group.id}`, {
-          accessMode: 'SHARED',
-        });
-        group = data.data;
-        setAccessGroup(group);
-      }
-      if (!grantUserId) {
-        setAccessError('Select a member to grant access');
-        return;
-      }
-      const { data } = await api.post(`/api/contacts/groups/${group.id}/access`, {
+      const { data } = await api.post(`/api/contacts/groups/${accessGroup.id}/access`, {
         userId: Number(grantUserId),
       });
       setAccessUsers(data.data.users || []);
       setGrantUserId('');
-      const refreshed = await api.get(`/api/contacts/groups/${group.id}/access`);
+      const refreshed = await api.get(`/api/contacts/groups/${accessGroup.id}/access`);
       setShareable(refreshed.data.data.shareable || []);
-      setAccessGroup(refreshed.data.data.group || group);
+      setAccessGroup(refreshed.data.data.group || accessGroup);
       await load();
+    } catch (err) {
+      setAccessError(getErrorMessage(err));
+    } finally {
+      setAccessSaving(false);
+    }
+  }
+
+  async function grantAllMembers() {
+    if (!accessGroup) return;
+    const ids = addableMembers.map((u) => Number(u.id)).filter(Boolean);
+    if (!ids.length) {
+      setAccessError('No members left to add');
+      return;
+    }
+    if (
+      !confirm(
+        `Add all ${ids.length} site member${ids.length === 1 ? '' : 's'} to this group? Admins will not be added.`
+      )
+    ) {
+      return;
+    }
+    setAccessSaving(true);
+    setAccessError('');
+    try {
+      const failed = [];
+      for (const userId of ids) {
+        try {
+          await api.post(`/api/contacts/groups/${accessGroup.id}/access`, { userId });
+        } catch {
+          failed.push(userId);
+        }
+      }
+      setGrantUserId('');
+      const refreshed = await api.get(`/api/contacts/groups/${accessGroup.id}/access`);
+      setAccessUsers(refreshed.data.data.users || []);
+      setShareable(refreshed.data.data.shareable || []);
+      setAccessGroup(refreshed.data.data.group || accessGroup);
+      await load();
+      if (failed.length) {
+        setAccessError(
+          `Added members, but ${failed.length} could not be added. Admins cannot be added.`
+        );
+      }
     } catch (err) {
       setAccessError(getErrorMessage(err));
     } finally {
@@ -189,6 +273,11 @@ export default function GroupsPage() {
 
   async function removeAccess(userId) {
     if (!accessGroup) return;
+    const target = (accessUsers || []).find((u) => String(u.id) === String(userId));
+    if (target && isSiteAdmin(target)) {
+      setAccessError('Admins cannot be removed from a group');
+      return;
+    }
     setAccessSaving(true);
     setAccessError('');
     try {
@@ -210,7 +299,7 @@ export default function GroupsPage() {
     if (!accessGroup) return;
     if (
       !confirm(
-        'Switch to Private? Explicit member access will be removed. Contacts and campaigns are kept.'
+        'Switch to Private? Org-wide Shared access ends. Individually added members stay until you remove them. Contacts are kept.'
       )
     ) {
       return;
@@ -222,9 +311,10 @@ export default function GroupsPage() {
         accessMode: 'PRIVATE',
       });
       setAccessGroup(data.data);
-      setAccessUsers([]);
       const refreshed = await api.get(`/api/contacts/groups/${accessGroup.id}/access`);
+      setAccessUsers(refreshed.data.data.users || []);
       setShareable(refreshed.data.data.shareable || []);
+      setAccessGroup(refreshed.data.data.group || data.data);
       await load();
     } catch (err) {
       setAccessError(getErrorMessage(err));
@@ -308,8 +398,8 @@ export default function GroupsPage() {
                     </td>
                     <td className="px-5 py-3.5 align-middle">
                       <div className="flex items-center gap-1.5">
-                        {r.can_manage_access ? (
-                          <IconAction title="Manage Access" onClick={() => openAccess(r)}>
+                        {canManageGroupMembers(r) ? (
+                          <IconAction title="Manage members" onClick={() => openAccess(r)}>
                             <Share2 size={14} />
                           </IconAction>
                         ) : null}
@@ -411,7 +501,7 @@ export default function GroupsPage() {
                     <span>
                       <span className="font-semibold text-slate-800">Private</span>
                       <span className="mt-0.5 block text-xs text-slate-500">
-                        Only you and Admins can access this group.
+                        Only you, Admins, and members you invite can access this group.
                       </span>
                     </span>
                   </label>
@@ -435,7 +525,7 @@ export default function GroupsPage() {
                 String(editing.access_mode).toUpperCase() === 'SHARED' &&
                 accessMode === 'PRIVATE' ? (
                   <p className="mt-2 text-xs text-amber-700">
-                    Switching to Private means only you and Admins can access this group.
+                    Switching to Private means only you, Admins, and invited members can access this group.
                   </p>
                 ) : null}
               </div>
@@ -460,10 +550,10 @@ export default function GroupsPage() {
             aria-label="Close"
             onClick={closeAccess}
           />
-          <div className="relative w-full max-w-lg rounded-2xl border border-[var(--line)] bg-white p-5 shadow-xl">
+          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--line)] bg-white p-5 shadow-xl">
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-lg font-extrabold text-slate-900">Manage Access</h3>
+                <h3 className="text-lg font-extrabold text-slate-900">Manage members</h3>
                 <p className="mt-1 text-sm text-slate-500">{accessGroup.name}</p>
               </div>
               <button
@@ -492,15 +582,98 @@ export default function GroupsPage() {
 
             {String(accessGroup.access_mode).toUpperCase() === 'SHARED' ? (
               <p className="mb-4 rounded-xl border border-dashed border-sky-200 bg-sky-50 px-3 py-3 text-sm text-sky-900">
-                This group is Shared. Every Member can view it and use it for contacts, campaigns,
-                and imports. Only you (owner) and Admins can edit or delete it.
+                Shared with everyone: every Member can view and use this group. You can still track
+                invited members below. Admins always have access.
               </p>
             ) : (
-              <p className="mb-4 rounded-xl border border-dashed border-[var(--line)] bg-slate-50 px-3 py-3 text-sm text-slate-500">
-                This group is Private. Only you and Admins can access it. Switch to Shared so every
-                Member can view and use it.
+              <p className="mb-4 rounded-xl border border-dashed border-[var(--line)] bg-slate-50 px-3 py-3 text-sm text-slate-600">
+                Private: only you, Admins, and members you add below can see and use this group.
               </p>
             )}
+
+            <div className="mb-4">
+              <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+                Add site members
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row">
+                <select
+                  className="input flex-1"
+                  value={grantUserId}
+                  onChange={(e) => setGrantUserId(e.target.value)}
+                  disabled={accessSaving || !addableMembers.length}
+                >
+                  <option value="">
+                    {addableMembers.length
+                      ? `Select a member… (${addableMembers.length} remaining)`
+                      : 'No members left to add'}
+                  </option>
+                  {addableMembers.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name} ({u.email})
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={accessSaving || !grantUserId}
+                  onClick={grantMemberAccess}
+                >
+                  {accessSaving ? 'Saving…' : 'Add member'}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  disabled={accessSaving || !addableMembers.length}
+                  onClick={grantAllMembers}
+                >
+                  Add all members
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-slate-400">
+                Group owners can add every site member except administrators. Admins already have
+                access to all groups and cannot be added or removed.
+              </p>
+            </div>
+
+            <div className="mb-5">
+              <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+                Members with access ({invitedMembers.length})
+              </div>
+              {invitedMembers.length ? (
+                <ul className="divide-y divide-[var(--line)] overflow-hidden rounded-xl border border-[var(--line)]">
+                  {invitedMembers.map((u) => (
+                    <li
+                      key={u.id}
+                      className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate font-semibold text-slate-800">{u.name}</div>
+                        <div className="truncate text-xs text-slate-500">{u.email}</div>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-secondary !px-2.5 !py-1 text-xs"
+                        disabled={accessSaving}
+                        onClick={() => removeAccess(u.id)}
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="rounded-xl border border-dashed border-[var(--line)] px-3 py-4 text-sm text-slate-400">
+                  No members added yet.
+                </div>
+              )}
+              {invitedAdmins.length ? (
+                <p className="mt-2 text-xs text-slate-400">
+                  {invitedAdmins.length} administrator{invitedAdmins.length === 1 ? '' : 's'} also
+                  have access and cannot be removed.
+                </p>
+              ) : null}
+            </div>
 
             <div className="flex flex-wrap justify-end gap-2">
               {String(accessGroup.access_mode).toUpperCase() === 'SHARED' ? (
@@ -515,7 +688,7 @@ export default function GroupsPage() {
               ) : (
                 <button
                   type="button"
-                  className="btn btn-primary"
+                  className="btn btn-secondary"
                   disabled={accessSaving}
                   onClick={async () => {
                     setAccessSaving(true);
@@ -533,7 +706,7 @@ export default function GroupsPage() {
                     }
                   }}
                 >
-                  {accessSaving ? 'Saving…' : 'Make Shared'}
+                  {accessSaving ? 'Saving…' : 'Make Shared (everyone)'}
                 </button>
               )}
               <button type="button" className="btn btn-secondary" onClick={closeAccess}>
