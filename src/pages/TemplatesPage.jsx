@@ -13,6 +13,7 @@ import {
   Trash2,
   XCircle,
 } from 'lucide-react';
+import { isIcon } from '../lib/isIcon';
 import { api, getErrorMessage } from '../lib/api';
 import { PageShell, IconAction } from '../components/PageShell';
 import { StatusBadge } from '../components/ui';
@@ -78,7 +79,7 @@ function StatCard({ label, value, hint, icon: Icon, tone }) {
   return (
     <div className="card flex items-start gap-3 p-4">
       <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${tone}`}>
-        <Icon size={18} />
+        {isIcon(Icon) ? <Icon size={18} /> : null}
       </div>
       <div className="min-w-0">
         <div className="text-xs font-bold uppercase tracking-wide text-slate-400">{label}</div>

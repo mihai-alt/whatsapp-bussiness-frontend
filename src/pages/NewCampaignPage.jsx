@@ -599,17 +599,14 @@ export default function NewCampaignPage() {
                         value: 'marketing',
                         title: 'Marketing',
                         desc: 'Promotional messages and offers',
-                        icon: Megaphone,
                       },
                       {
                         value: 'utility',
                         title: 'Utility',
                         desc: 'Transactional or update messages',
-                        icon: MessageSquare,
                       },
                     ].map((opt) => {
                       const active = form.campaignType === opt.value;
-                      const Icon = opt.icon;
                       return (
                         <button
                           key={opt.value}
@@ -629,7 +626,7 @@ export default function NewCampaignPage() {
                                   : 'bg-slate-100 text-slate-500'
                               }`}
                             >
-                              <Icon size={18} />
+                              {opt.value === 'marketing' ? <Megaphone size={18} /> : <MessageSquare size={18} />}
                             </span>
                             <div>
                               <div className="font-extrabold text-slate-900">{opt.title}</div>

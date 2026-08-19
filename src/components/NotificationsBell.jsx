@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useNotifications } from '../context/NotificationsContext';
 import { PageLoader } from './ui';
+import { isIcon } from '../lib/isIcon';
 
 function iconFor(type) {
   const t = String(type || '').toLowerCase();
@@ -156,7 +157,7 @@ export default function NotificationsBell() {
                       <div
                         className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-md ${tone}`}
                       >
-                        <Icon size={16} />
+                        {isIcon(Icon) ? <Icon size={16} /> : null}
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-[13px] leading-snug text-[var(--ink-soft)]">

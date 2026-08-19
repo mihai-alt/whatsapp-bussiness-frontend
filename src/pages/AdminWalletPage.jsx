@@ -20,6 +20,7 @@ import { openRazorpayCheckout } from '../lib/razorpay';
 import { useAuth } from '../context/AuthContext';
 import { PageShell, DataTable } from '../components/PageShell';
 import { StatusBadge, PageLoader } from '../components/ui';
+import { isIcon } from '../lib/isIcon';
 
 const PRESETS = [500, 1000, 2000, 5000, 10000];
 
@@ -469,7 +470,9 @@ export default function AdminWalletPage() {
 
       {/* Top summary cards */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {summaryCards.map((c) => (
+        {summaryCards.map((c) => {
+          const CardIcon = c.icon;
+          return (
           <div key={c.label} className="card p-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -478,11 +481,12 @@ export default function AdminWalletPage() {
                 <div className="mt-1 text-xs text-slate-500">{c.hint}</div>
               </div>
               <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${c.iconClass}`}>
-                <c.icon size={18} />
+                {isIcon(CardIcon) ? <CardIcon size={18} /> : null}
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Middle + bottom: chart/transactions | actions/summary/methods */}

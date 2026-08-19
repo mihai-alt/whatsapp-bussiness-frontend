@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { BrandLockup, WhatsAppMark } from './Brand';
 import ThemeToggle from './ThemeToggle';
+import { isIcon } from '../lib/isIcon';
 
 const previewNav = [
   LayoutDashboard,
@@ -56,7 +57,7 @@ export default function AuthLayout({ children, heading, subheading }) {
                       idx === 0 ? 'bg-[var(--wa)] text-white' : 'text-slate-400'
                     }`}
                   >
-                    <Icon size={16} />
+                    {isIcon(Icon) ? <Icon size={16} /> : null}
                   </div>
                 ))}
               </div>

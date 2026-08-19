@@ -15,7 +15,6 @@ import {
   ChevronDown,
   FolderOpen,
   UserRound,
-  Search,
   History,
   Receipt,
   ScrollText,
@@ -36,22 +35,21 @@ function roleLabel(role) {
   return role || '';
 }
 
-const links = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/whatsapp', label: 'Numbers', icon: Phone },
-  { to: '/profile', label: 'Profile', icon: Building2 },
-  { to: '/templates', label: 'Templates', icon: FileText },
-  { to: '/contacts', label: 'Contacts', icon: Users },
-  { to: '/groups', label: 'Groups', icon: FolderOpen },
-  { to: '/campaigns', label: 'Campaigns', icon: Megaphone },
-  { to: '/wallet', label: 'Wallet', icon: Wallet },
-  { to: '/admin/wallet/transactions', label: 'Transactions', icon: Receipt, adminOnly: true },
-  { to: '/admin/wallet/recharges', label: 'Recharge History', icon: History, adminOnly: true },
-  { to: '/reports', label: 'Reports', icon: BarChart3 },
-  { to: '/settings', label: 'Settings', icon: Settings },
-  { to: '/users', label: 'Users', icon: UserRound, adminOnly: true },
-  { to: '/audit-logs', label: 'Audit Logs', icon: ScrollText, adminOnly: true },
-];
+function SideLink({ to, end, label, isAdmin, onNavigate, children }) {
+  return (
+    <NavLink
+      to={to}
+      end={end}
+      onClick={onNavigate}
+      onMouseEnter={() => prefetchRoute(to, isAdmin)}
+      onFocus={() => prefetchRoute(to, isAdmin)}
+      className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+    >
+      {children}
+      <span className="flex-1">{label}</span>
+    </NavLink>
+  );
+}
 
 const titles = {
   '/': 'Dashboard',
@@ -95,7 +93,7 @@ export default function AppLayout() {
     return titles[location.pathname] || 'Dashboard';
   }, [location.pathname]);
 
-  const navLinks = links.filter((l) => !l.adminOnly || isAdmin);
+  const closeNav = () => setOpen(false);
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[250px_1fr] bg-[var(--surface)]">
@@ -110,20 +108,56 @@ export default function AppLayout() {
           </div>
 
           <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-            {navLinks.map(({ to, label, icon: Icon }) => (
-              <NavLink
-                key={`${to}-${label}`}
-                to={to}
-                end={to === '/'}
-                onClick={() => setOpen(false)}
-                onMouseEnter={() => prefetchRoute(to, isAdmin)}
-                onFocus={() => prefetchRoute(to, isAdmin)}
-                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-              >
-                {Icon ? <Icon size={18} /> : null}
-                <span className="flex-1">{label}</span>
-              </NavLink>
-            ))}
+            <SideLink to="/" end label="Dashboard" isAdmin={isAdmin} onNavigate={closeNav}>
+              <LayoutDashboard size={18} />
+            </SideLink>
+            <SideLink to="/whatsapp" label="Numbers" isAdmin={isAdmin} onNavigate={closeNav}>
+              <Phone size={18} />
+            </SideLink>
+            <SideLink to="/profile" label="Profile" isAdmin={isAdmin} onNavigate={closeNav}>
+              <Building2 size={18} />
+            </SideLink>
+            <SideLink to="/templates" label="Templates" isAdmin={isAdmin} onNavigate={closeNav}>
+              <FileText size={18} />
+            </SideLink>
+            <SideLink to="/contacts" label="Contacts" isAdmin={isAdmin} onNavigate={closeNav}>
+              <Users size={18} />
+            </SideLink>
+            <SideLink to="/groups" label="Groups" isAdmin={isAdmin} onNavigate={closeNav}>
+              <FolderOpen size={18} />
+            </SideLink>
+            <SideLink to="/campaigns" label="Campaigns" isAdmin={isAdmin} onNavigate={closeNav}>
+              <Megaphone size={18} />
+            </SideLink>
+            <SideLink to="/wallet" label="Wallet" isAdmin={isAdmin} onNavigate={closeNav}>
+              <Wallet size={18} />
+            </SideLink>
+            {isAdmin ? (
+              <SideLink to="/admin/wallet/transactions" label="Transactions" isAdmin={isAdmin} onNavigate={closeNav}>
+                <Receipt size={18} />
+              </SideLink>
+            ) : null}
+            {isAdmin ? (
+              <SideLink to="/admin/wallet/recharges" label="Recharge History" isAdmin={isAdmin} onNavigate={closeNav}>
+                <History size={18} />
+              </SideLink>
+            ) : null}
+            <SideLink to="/reports" label="Reports" isAdmin={isAdmin} onNavigate={closeNav}>
+              <BarChart3 size={18} />
+            </SideLink>
+            <SideLink to="/settings" label="Settings" isAdmin={isAdmin} onNavigate={closeNav}>
+              <Settings size={18} />
+            </SideLink>
+            {isAdmin ? (
+              <SideLink to="/users" label="Users" isAdmin={isAdmin} onNavigate={closeNav}>
+                <UserRound size={18} />
+              </SideLink>
+            ) : null}
+            {isAdmin ? (
+              <SideLink to="/audit-logs" label="Audit Logs" isAdmin={isAdmin} onNavigate={closeNav}>
+                <ScrollText size={18} />
+              </SideLink>
+            ) : null}
           </nav>
 
           <div className="border-t border-white/5 p-4">

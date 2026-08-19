@@ -20,6 +20,7 @@ import {
   Webhook,
 } from 'lucide-react';
 import { api, getErrorMessage } from '../lib/api';
+import { isIcon } from '../lib/isIcon';
 import { useAuth } from '../context/AuthContext';
 import UserAvatar from '../components/UserAvatar';
 import { Breadcrumb } from '../components/PageShell';
@@ -68,7 +69,9 @@ function FieldLabel({ children }) {
 function IconField({ icon: Icon, children, className = '' }) {
   return (
     <div className={`relative ${className}`}>
-      <Icon size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+      {isIcon(Icon) ? (
+        <Icon size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+      ) : null}
       {children}
     </div>
   );
@@ -250,7 +253,9 @@ export default function SettingsPage() {
                   {active ? (
                     <span className="absolute inset-y-1.5 left-0 w-1 rounded-full bg-[var(--wa)]" />
                   ) : null}
-                  <Icon size={17} className={active ? 'text-[var(--wa)]' : 'text-slate-400'} />
+                  {isIcon(Icon) ? (
+                    <Icon size={17} className={active ? 'text-[var(--wa)]' : 'text-slate-400'} />
+                  ) : null}
                   {label}
                 </button>
               );

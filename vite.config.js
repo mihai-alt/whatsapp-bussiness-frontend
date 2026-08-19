@@ -7,6 +7,12 @@ const DEV_PORT = 5173;
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    conditions: ['import', 'module', 'browser', 'default'],
+    alias: {
+      'lucide-react': 'lucide-react/dist/esm/lucide-react.js',
+    },
+  },
   server: {
     host: DEV_HOST,
     port: DEV_PORT,
