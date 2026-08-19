@@ -63,12 +63,12 @@ export default function DashboardPage() {
   const quality = account?.quality_rating || '—';
   const today = data?.today || {};
   const recentCampaigns = Array.isArray(data?.recentCampaigns) ? data.recentCampaigns : [];
-  const metrics = [
-    { label: 'Sent', value: today.sent, icon: Send, color: '#3b82f6' },
-    { label: 'Delivered', value: today.delivered, icon: CheckCheck, color: '#25d366' },
-    { label: 'Read', value: today.read, icon: Eye, color: '#f59e0b' },
-    { label: 'Failed', value: today.failed, icon: XCircle, color: '#ef4444' },
-    { label: 'Pending', value: today.pending, icon: Clock3, color: '#94a3b8' },
+  const metricCells = [
+    { label: 'Sent', value: today.sent ?? 0, color: '#3b82f6', icon: <Send size={14} style={{ color: '#3b82f6' }} /> },
+    { label: 'Delivered', value: today.delivered ?? 0, color: '#25d366', icon: <CheckCheck size={14} style={{ color: '#25d366' }} /> },
+    { label: 'Read', value: today.read ?? 0, color: '#f59e0b', icon: <Eye size={14} style={{ color: '#f59e0b' }} /> },
+    { label: 'Failed', value: today.failed ?? 0, color: '#ef4444', icon: <XCircle size={14} style={{ color: '#ef4444' }} /> },
+    { label: 'Pending', value: today.pending ?? 0, color: '#94a3b8', icon: <Clock3 size={14} style={{ color: '#94a3b8' }} /> },
   ];
 
   return (
@@ -119,19 +119,16 @@ export default function DashboardPage() {
       <div className="card overflow-hidden">
         <div className="border-b border-[var(--line)] px-5 py-3 font-extrabold text-slate-800">Today's Messaging</div>
         <div className="grid grid-cols-2 md:grid-cols-5">
-          {metrics.map((m, idx) => {
-            const MetricIcon = m.icon;
-            return (
-              <div key={m.label} className={`relative p-4 ${idx < metrics.length - 1 ? 'md:border-r border-[var(--line)]' : ''}`}>
+          {metricCells.map((m, idx) => (
+              <div key={m.label} className={`relative p-4 ${idx < metricCells.length - 1 ? 'md:border-r border-[var(--line)]' : ''}`}>
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                  {MetricIcon ? <MetricIcon size={14} style={{ color: m.color }} /> : null}
+                  {m.icon}
                   {m.label}
                 </div>
-                <div className="mt-2 text-2xl font-extrabold text-slate-900">{m.value ?? 0}</div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-900">{m.value}</div>
                 <div className="mt-3 h-1 rounded-full" style={{ background: m.color }} />
               </div>
-            );
-          })}
+          ))}
         </div>
       </div>
 
@@ -175,25 +172,34 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          { to: '/campaigns/new', title: 'Create Campaign', desc: 'Send bulk template messages', icon: Megaphone, tone: 'bg-[#e8faf0] text-[var(--wa-deep)]' },
-          { to: '/contacts', title: 'Add Contacts', desc: 'Import CSV or add manually', icon: Users, tone: 'bg-[#eef6ff] text-blue-600' },
-          { to: '/templates', title: 'Create Template', desc: 'Submit for Meta approval', icon: FileText, tone: 'bg-[#f5f0ff] text-violet-600' },
-          { to: '/wallet', title: 'Add Money', desc: 'Recharge wallet balance', icon: PlusCircle, tone: 'bg-[#fff7e8] text-amber-600' },
-        ].map((a) => {
-          const ActionIcon = a.icon;
-          return (
-            <Link key={a.title} to={a.to} className="card p-4 hover:shadow-md transition flex items-center gap-3">
-              <div className={`grid h-11 w-11 place-items-center rounded-xl ${a.tone}`}>
-                {ActionIcon ? <ActionIcon size={18} /> : null}
-              </div>
-              <div>
-                <div className="font-extrabold text-slate-900">{a.title}</div>
-                <div className="text-xs text-slate-500">{a.desc}</div>
-              </div>
-            </Link>
-          );
-        })}
+        <Link to="/campaigns/new" className="card p-4 hover:shadow-md transition flex items-center gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#e8faf0] text-[var(--wa-deep)]"><Megaphone size={18} /></div>
+          <div>
+            <div className="font-extrabold text-slate-900">Create Campaign</div>
+            <div className="text-xs text-slate-500">Send bulk template messages</div>
+          </div>
+        </Link>
+        <Link to="/contacts" className="card p-4 hover:shadow-md transition flex items-center gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#eef6ff] text-blue-600"><Users size={18} /></div>
+          <div>
+            <div className="font-extrabold text-slate-900">Add Contacts</div>
+            <div className="text-xs text-slate-500">Import CSV or add manually</div>
+          </div>
+        </Link>
+        <Link to="/templates" className="card p-4 hover:shadow-md transition flex items-center gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#f5f0ff] text-violet-600"><FileText size={18} /></div>
+          <div>
+            <div className="font-extrabold text-slate-900">Create Template</div>
+            <div className="text-xs text-slate-500">Submit for Meta approval</div>
+          </div>
+        </Link>
+        <Link to="/wallet" className="card p-4 hover:shadow-md transition flex items-center gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-[#fff7e8] text-amber-600"><PlusCircle size={18} /></div>
+          <div>
+            <div className="font-extrabold text-slate-900">Add Money</div>
+            <div className="text-xs text-slate-500">Recharge wallet balance</div>
+          </div>
+        </Link>
       </div>
     </PageShell>
   );

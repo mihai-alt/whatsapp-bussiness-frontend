@@ -68,10 +68,11 @@ export default function GroupsPage() {
   const accessGroupRef = useRef(null);
   accessGroupRef.current = accessGroup;
 
-  const { data: groups = [], isPending, refetch } = useQuery({
+  const { data: groupData, isPending, refetch } = useQuery({
     queryKey: queryKeys.groups,
     queryFn: fetchGroups,
   });
+  const groups = Array.isArray(groupData) ? groupData : [];
   const loading = isPending && groups.length === 0;
 
   const addableMembers = useMemo(() => asMemberList(shareable), [shareable]);

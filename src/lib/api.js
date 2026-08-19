@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { getAdapter } from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -8,9 +8,30 @@ export function clearAuthStorage() {
   AUTH_KEYS.forEach((key) => localStorage.removeItem(key));
 }
 
+function resolveHttpAdapter() {
+  const resolve = typeof getAdapter === 'function' ? getAdapter : axios.getAdapter;
+  if (typeof resolve !== 'function') return undefined;
+  try {
+    return resolve('fetch');
+  } catch {
+    /* Axios 1.x may not expose fetch in every bundle */
+  }
+  try {
+    return resolve('xhr');
+  } catch {
+    return undefined;
+  }
+}
+
+const httpAdapter = resolveHttpAdapter();
+if (httpAdapter) {
+  axios.defaults.adapter = httpAdapter;
+}
+
 export const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
+  ...(httpAdapter ? { adapter: httpAdapter } : {}),
 });
 
 api.interceptors.request.use((config) => {
@@ -29,7 +50,11 @@ function refreshAccessToken() {
   refreshPromise = (async () => {
     const refreshToken = localStorage.getItem('refreshToken');
     if (!refreshToken) throw new Error('No refresh token');
-    const { data } = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken });
+    const { data } = await axios.post(
+      `${API_URL}/api/auth/refresh`,
+      { refreshToken },
+      httpAdapter ? { adapter: httpAdapter } : undefined
+    );
     const accessToken = data?.data?.accessToken;
     if (!accessToken) throw new Error('Refresh failed');
     localStorage.setItem('accessToken', accessToken);

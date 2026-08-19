@@ -85,10 +85,6 @@ export default function AppLayout() {
 
   useEffect(() => startApiKeepAlive(), []);
 
-  useEffect(() => {
-    prefetchRoute(location.pathname, isAdmin);
-  }, [location.pathname, isAdmin]);
-
   const pageTitle = useMemo(() => {
     if (
       location.pathname.startsWith('/campaigns/') &&
@@ -124,7 +120,7 @@ export default function AppLayout() {
                 onFocus={() => prefetchRoute(to, isAdmin)}
                 className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
               >
-                <Icon size={18} />
+                {Icon ? <Icon size={18} /> : null}
                 <span className="flex-1">{label}</span>
               </NavLink>
             ))}

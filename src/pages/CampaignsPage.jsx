@@ -22,10 +22,11 @@ export default function CampaignsPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busyId, setBusyId] = useState(null);
-  const { data: campaigns = [], isPending, refetch } = useQuery({
+  const { data: campaignData, isPending, refetch } = useQuery({
     queryKey: queryKeys.campaigns,
     queryFn: fetchCampaigns,
   });
+  const campaigns = Array.isArray(campaignData) ? campaignData : [];
   const loading = isPending && campaigns.length === 0;
 
   const load = useCallback(async () => {
