@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { FolderOpen, Lock, Pencil, Plus, Share2, Trash2, Users, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api, getErrorMessage } from '../lib/api';
+import { fetchGroups, queryKeys } from '../lib/queries';
 import { PageShell, IconAction } from '../components/PageShell';
 import { useAuth } from '../context/AuthContext';
 import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
@@ -68,11 +69,8 @@ export default function GroupsPage() {
   accessGroupRef.current = accessGroup;
 
   const { data: groups = [], isPending, refetch } = useQuery({
-    queryKey: ['contact-groups'],
-    queryFn: async () => {
-      const { data } = await api.get('/api/contacts/groups/list');
-      return data.data || [];
-    },
+    queryKey: queryKeys.groups,
+    queryFn: fetchGroups,
   });
   const loading = isPending && groups.length === 0;
 

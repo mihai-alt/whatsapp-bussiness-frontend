@@ -86,7 +86,6 @@ body {
 
 /* Freelancer-style circular dots */
 .orbit-loader {
-  --orbit-n: 8;
   --orbit-size: 3.35rem;
   --orbit-dot: 0.52rem;
   position: relative;
@@ -105,13 +104,13 @@ body {
   --orbit-dot: 0.64rem;
 }
 
-.orbit-loader span {
+.orbit-loader__dot {
   position: absolute;
   inset: 0;
   transform: rotate(calc(var(--i) * 45deg));
 }
 
-.orbit-loader span::after {
+.orbit-loader__dot::after {
   content: "";
   position: absolute;
   top: 0;

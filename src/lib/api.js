@@ -1,102 +1,62 @@
 import axios from 'axios';
-import { queryClient } from './queryClient.js';
 
 const API_URL = import.meta.env.VITE_API_URL || '';
-const GET_TTL_MS = 45_000;
 
-const getCache = new Map();
+const AUTH_KEYS = ['accessToken', 'refreshToken', 'user'];
+
+export function clearAuthStorage() {
+  AUTH_KEYS.forEach((key) => localStorage.removeItem(key));
+}
 
 export const api = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
 });
 
-function normalizeParams(params) {
-  if (!params || typeof params !== 'object') return '';
-  const cleaned = {};
-  for (const key of Object.keys(params).sort()) {
-    const value = params[key];
-    if (value === undefined || value === null || value === '') continue;
-    cleaned[key] = value;
-  }
-  return JSON.stringify(cleaned);
-}
-
-function requestKey(config) {
-  const method = String(config.method || 'get').toLowerCase();
-  const url = `${config.baseURL || API_URL || ''}${config.url || ''}`;
-  return `${method}:${url}:${normalizeParams(config.params)}`;
-}
-
-function shouldCacheGet(config) {
-  if (!config) return false;
-  if (String(config.method || 'get').toLowerCase() !== 'get') return false;
-  if (config.cache === false) return false;
-  if (config.responseType && config.responseType !== 'json') return false;
-  const url = String(config.url || '');
-  if (url.includes('/notifications') || url.includes('/health')) return false;
-  return true;
-}
-
-function cloneCached(hit, config) {
-  return {
-    data: structuredClone(hit.data),
-    status: 200,
-    statusText: 'OK',
-    headers: hit.headers || {},
-    config,
-    request: {},
-  };
-}
-
-export function clearApiGetCache() {
-  getCache.clear();
-}
-
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('accessToken');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-
-  if (!shouldCacheGet(config)) return config;
-
-  const key = requestKey(config);
-  const ttl = Number(config.cacheTtl ?? GET_TTL_MS);
-  const hit = getCache.get(key);
-  if (hit && Date.now() - hit.at < ttl) {
-    config.adapter = () => Promise.resolve(cloneCached(hit, config));
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
+let refreshPromise = null;
+
+function refreshAccessToken() {
+  if (refreshPromise) return refreshPromise;
+  refreshPromise = (async () => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    if (!refreshToken) throw new Error('No refresh token');
+    const { data } = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken });
+    const accessToken = data?.data?.accessToken;
+    if (!accessToken) throw new Error('Refresh failed');
+    localStorage.setItem('accessToken', accessToken);
+    if (data.data.refreshToken) {
+      localStorage.setItem('refreshToken', data.data.refreshToken);
+    }
+    return accessToken;
+  })().finally(() => {
+    refreshPromise = null;
+  });
+  return refreshPromise;
+}
+
 api.interceptors.response.use(
-  (res) => {
-    const method = String(res.config?.method || 'get').toLowerCase();
-    if (method === 'get' && shouldCacheGet(res.config) && res.status >= 200 && res.status < 300) {
-      getCache.set(requestKey(res.config), {
-        data: res.data,
-        at: Date.now(),
-        headers: {},
-      });
-    }
-    if (method !== 'get' && res.status >= 200 && res.status < 300) {
-      clearApiGetCache();
-      queryClient.invalidateQueries().catch(() => {});
-    }
-    return res;
-  },
+  (res) => res,
   async (error) => {
     const original = error.config;
     if (error.response?.status === 401 && original && !original._retry) {
       original._retry = true;
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          const { data } = await axios.post(`${API_URL}/api/auth/refresh`, { refreshToken });
-          localStorage.setItem('accessToken', data.data.accessToken);
-          original.headers.Authorization = `Bearer ${data.data.accessToken}`;
-          return api(original);
-        } catch {
-          localStorage.clear();
+      try {
+        const accessToken = await refreshAccessToken();
+        original.headers = original.headers || {};
+        original.headers.Authorization = `Bearer ${accessToken}`;
+        return api(original);
+      } catch {
+        clearAuthStorage();
+        if (window.location.pathname !== '/login') {
           window.location.href = '/login';
         }
       }
@@ -104,10 +64,6 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export function prefetchGet(url, config = {}) {
-  return api.get(url, config).catch(() => {});
-}
 
 export function startApiKeepAlive() {
   const base = API_URL || window.location.origin;
@@ -125,4 +81,10 @@ export function getErrorMessage(err) {
 
 export function getErrorCode(err) {
   return err?.response?.data?.error?.code || '';
+}
+
+export function unwrapApiData(res) {
+  const body = res?.data;
+  if (body && typeof body === 'object' && 'data' in body) return body.data;
+  return body;
 }

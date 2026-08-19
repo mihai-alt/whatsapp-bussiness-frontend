@@ -26,7 +26,9 @@ import { BrandLockup } from './Brand';
 import UserAvatar from './UserAvatar';
 import NotificationsBell from './NotificationsBell';
 import ThemeToggle from './ThemeToggle';
-import { prefetchGet, startApiKeepAlive } from '../lib/api';
+import { startApiKeepAlive } from '../lib/api';
+import { prefetchRoute } from '../lib/queries';
+import ViewErrorBoundary from './ViewErrorBoundary';
 
 function roleLabel(role) {
   if (role === 'admin') return 'Super Admin';
@@ -71,31 +73,6 @@ const titles = {
   '/audit-logs': 'Audit Logs',
 };
 
-const PREFETCH = {
-  '/': ['/api/dashboard'],
-  '/whatsapp': ['/api/numbers'],
-  '/profile': ['/api/numbers'],
-  '/templates': ['/api/templates/stats', '/api/whatsapp'],
-  '/contacts': ['/api/contacts', '/api/contacts/groups/available'],
-  '/groups': ['/api/contacts/groups/list'],
-  '/campaigns': ['/api/campaigns'],
-  '/reports': ['/api/reports/messages'],
-  '/users': ['/api/auth/users'],
-  '/audit-logs': ['/api/audit-logs'],
-  '/admin/wallet/transactions': ['/api/admin/wallet/transactions'],
-  '/admin/wallet/recharges': ['/api/admin/wallet/recharges'],
-};
-
-function prefetchRoute(to, isAdmin) {
-  if (to === '/wallet') {
-    prefetchGet(isAdmin ? '/api/admin/wallet' : '/api/wallet');
-    return;
-  }
-  const urls = PREFETCH[to];
-  if (!urls) return;
-  urls.forEach((url) => prefetchGet(url));
-}
-
 export default function AppLayout() {
   const { user, logout, isAdmin } = useAuth();
   const { refreshUnread } = useNotifications();
@@ -109,10 +86,8 @@ export default function AppLayout() {
   useEffect(() => startApiKeepAlive(), []);
 
   useEffect(() => {
-    prefetchGet('/api/dashboard');
-    prefetchGet('/api/campaigns');
-    prefetchGet('/api/contacts/groups/list');
-  }, []);
+    prefetchRoute(location.pathname, isAdmin);
+  }, [location.pathname, isAdmin]);
 
   const pageTitle = useMemo(() => {
     if (
@@ -210,7 +185,9 @@ export default function AppLayout() {
         </header>
 
         <main className="p-4 md:p-6">
-          <Outlet />
+          <ViewErrorBoundary key={location.pathname}>
+            <Outlet />
+          </ViewErrorBoundary>
         </main>
       </div>
     </div>

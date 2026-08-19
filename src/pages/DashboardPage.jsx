@@ -15,7 +15,7 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { api } from '../lib/api';
+import { fetchDashboard, queryKeys } from '../lib/queries';
 import { EmptyState, StatusBadge, PageLoader } from '../components/ui';
 import { PageShell } from '../components/PageShell';
 import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
@@ -31,30 +31,27 @@ function Sparkline({ color = '#25d366' }) {
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
-  const { data, error, isPending, refetch } = useQuery({
-    queryKey: ['dashboard'],
-    queryFn: async () => {
-      const { data: res } = await api.get('/api/dashboard');
-      return res.data;
-    },
+  const { data, error, refetch } = useQuery({
+    queryKey: queryKeys.dashboard,
+    queryFn: fetchDashboard,
     retry: 2,
   });
 
   useWorkspaceRealtime(['campaigns', 'contacts', 'groups', 'wallet'], () => {
-    queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.dashboard });
   });
 
-  if (error && !data) {
-    return (
-      <div className="card flex min-h-[calc(100vh-11.5rem)] flex-col items-center justify-center px-6 text-center">
-        <p className="text-sm text-slate-500">Could not load dashboard. Please try again.</p>
-        <button type="button" className="btn btn-primary mt-4" onClick={() => refetch()}>
-          Retry
-        </button>
-      </div>
-    );
-  }
-  if (isPending && !data) {
+  if (!data) {
+    if (error) {
+      return (
+        <div className="card flex min-h-[calc(100vh-11.5rem)] flex-col items-center justify-center px-6 text-center">
+          <p className="text-sm text-[var(--muted)]">Could not load dashboard. Please try again.</p>
+          <button type="button" className="btn btn-primary mt-4" onClick={() => refetch()}>
+            Retry
+          </button>
+        </div>
+      );
+    }
     return (
       <div className="card min-h-[calc(100vh-11.5rem)]">
         <PageLoader className="min-h-[calc(100vh-11.5rem)]" size="lg" />
@@ -62,10 +59,10 @@ export default function DashboardPage() {
     );
   }
 
-  const account = data.primaryAccount;
+  const account = data?.primaryAccount;
   const quality = account?.quality_rating || '—';
-
-  const today = data.today || {};
+  const today = data?.today || {};
+  const recentCampaigns = Array.isArray(data?.recentCampaigns) ? data.recentCampaigns : [];
   const metrics = [
     { label: 'Sent', value: today.sent, icon: Send, color: '#3b82f6' },
     { label: 'Delivered', value: today.delivered, icon: CheckCheck, color: '#25d366' },
@@ -123,14 +120,14 @@ export default function DashboardPage() {
         <div className="border-b border-[var(--line)] px-5 py-3 font-extrabold text-slate-800">Today's Messaging</div>
         <div className="grid grid-cols-2 md:grid-cols-5">
           {metrics.map((m, idx) => {
-            const Icon = m.icon;
+            const MetricIcon = m.icon;
             return (
               <div key={m.label} className={`relative p-4 ${idx < metrics.length - 1 ? 'md:border-r border-[var(--line)]' : ''}`}>
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                  <Icon size={14} style={{ color: m.color }} />
+                  {MetricIcon ? <MetricIcon size={14} style={{ color: m.color }} /> : null}
                   {m.label}
                 </div>
-                <div className="mt-2 text-2xl font-extrabold text-slate-900">{m.value}</div>
+                <div className="mt-2 text-2xl font-extrabold text-slate-900">{m.value ?? 0}</div>
                 <div className="mt-3 h-1 rounded-full" style={{ background: m.color }} />
               </div>
             );
@@ -143,7 +140,7 @@ export default function DashboardPage() {
           <div className="font-extrabold text-slate-800">Recent Campaigns</div>
           <Link to="/campaigns" className="text-sm font-bold text-[var(--wa-deep)]">View All</Link>
         </div>
-        {(data.recentCampaigns || []).length === 0 ? (
+        {recentCampaigns.length === 0 ? (
           <div className="p-5"><EmptyState title="No campaigns yet" body="Create a campaign to start bulk messaging." /></div>
         ) : (
           <div className="overflow-x-auto">
@@ -159,7 +156,7 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {data.recentCampaigns.map((c) => (
+                {recentCampaigns.map((c) => (
                   <tr key={c.id} className="border-t border-[var(--line)] hover:bg-slate-50/70">
                     <td className="px-4 py-3">
                       <Link className="font-bold text-slate-800 hover:text-[var(--wa-deep)]" to={`/campaigns/${c.id}`}>{c.name}</Link>
@@ -184,10 +181,12 @@ export default function DashboardPage() {
           { to: '/templates', title: 'Create Template', desc: 'Submit for Meta approval', icon: FileText, tone: 'bg-[#f5f0ff] text-violet-600' },
           { to: '/wallet', title: 'Add Money', desc: 'Recharge wallet balance', icon: PlusCircle, tone: 'bg-[#fff7e8] text-amber-600' },
         ].map((a) => {
-          const Icon = a.icon;
+          const ActionIcon = a.icon;
           return (
             <Link key={a.title} to={a.to} className="card p-4 hover:shadow-md transition flex items-center gap-3">
-              <div className={`grid h-11 w-11 place-items-center rounded-xl ${a.tone}`}><Icon size={18} /></div>
+              <div className={`grid h-11 w-11 place-items-center rounded-xl ${a.tone}`}>
+                {ActionIcon ? <ActionIcon size={18} /> : null}
+              </div>
               <div>
                 <div className="font-extrabold text-slate-900">{a.title}</div>
                 <div className="text-xs text-slate-500">{a.desc}</div>

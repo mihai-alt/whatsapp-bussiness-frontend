@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { Check, Eye, Pause, Play, Plus, Rocket, RotateCcw, Send, XCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api, getErrorMessage } from '../lib/api';
+import { fetchCampaigns, queryKeys } from '../lib/queries';
 import { useAuth } from '../context/AuthContext';
 import { PageShell, IconAction } from '../components/PageShell';
 import { StatusBadge, PageLoader } from '../components/ui';
@@ -22,11 +23,8 @@ export default function CampaignsPage() {
   const [message, setMessage] = useState('');
   const [busyId, setBusyId] = useState(null);
   const { data: campaigns = [], isPending, refetch } = useQuery({
-    queryKey: ['campaigns'],
-    queryFn: async () => {
-      const { data } = await api.get('/api/campaigns');
-      return data.data || [];
-    },
+    queryKey: queryKeys.campaigns,
+    queryFn: fetchCampaigns,
   });
   const loading = isPending && campaigns.length === 0;
 

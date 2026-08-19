@@ -52,7 +52,7 @@ export function PageLoader({ className = '', size = 'md' }) {
         aria-hidden="true"
       >
         {Array.from({ length: 8 }, (_, i) => (
-          <span key={i} style={{ '--i': i }} />
+          <div key={i} className="orbit-loader__dot" style={{ '--i': i }} />
         ))}
       </div>
     </div>

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { BarChart3 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { api, getErrorMessage } from '../lib/api';
+import { getErrorMessage } from '../lib/api';
+import { fetchReports, queryKeys } from '../lib/queries';
 import { PageLoader, StatCard } from '../components/ui';
 import { PageShell } from '../components/PageShell';
 
@@ -55,11 +56,8 @@ function AnalyticsChart({ points }) {
 
 export default function ReportsPage() {
   const { data, isPending, error: queryError } = useQuery({
-    queryKey: ['reports-messages'],
-    queryFn: async () => {
-      const { data: res } = await api.get('/api/reports/messages');
-      return res.data;
-    },
+    queryKey: queryKeys.reports,
+    queryFn: fetchReports,
   });
   const summary = data?.summary || null;
   const daily = data?.daily || [];

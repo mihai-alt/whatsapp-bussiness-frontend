@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { api } from '../lib/api';
+import { api, clearAuthStorage } from '../lib/api';
 
 const AuthContext = createContext(null);
 
@@ -31,14 +31,16 @@ export function AuthProvider({ children }) {
       return;
     }
     api
-      .get('/api/auth/me', { cache: false })
+      .get('/api/auth/me')
       .then((res) => {
         setUser(res.data.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.data.user));
       })
-      .catch(() => {
-        localStorage.clear();
-        setUser(null);
+      .catch((err) => {
+        if (err?.response?.status === 401) {
+          clearAuthStorage();
+          setUser(null);
+        }
       })
       .finally(() => setLoading(false));
   }, []);
@@ -73,7 +75,7 @@ export function AuthProvider({ children }) {
         return data.data;
       },
       logout() {
-        localStorage.clear();
+        clearAuthStorage();
         setUser(null);
       },
       setUser(next) {
