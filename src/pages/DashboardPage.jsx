@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import {
   Phone,
@@ -15,9 +14,11 @@ import {
   FileText,
   PlusCircle,
 } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, getErrorMessage } from '../lib/api';
-import { EmptyState, StatusBadge } from '../components/ui';
+import { EmptyState, StatusBadge, PageLoader } from '../components/ui';
 import { PageShell } from '../components/PageShell';
+import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
 
 function Sparkline({ color = '#25d366' }) {
   return (
@@ -29,28 +30,38 @@ function Sparkline({ color = '#25d366' }) {
 }
 
 export default function DashboardPage() {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState('');
+  const queryClient = useQueryClient();
+  const { data, error, isPending } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: async () => {
+      const { data: res } = await api.get('/api/dashboard');
+      return res.data;
+    },
+  });
 
-  useEffect(() => {
-    api
-      .get('/api/dashboard')
-      .then((res) => setData(res.data.data))
-      .catch((err) => setError(getErrorMessage(err)));
-  }, []);
+  useWorkspaceRealtime(['campaigns', 'contacts', 'groups', 'wallet'], () => {
+    queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+  });
 
-  if (error) return <div className="text-red-700">{error}</div>;
-  if (!data) return <div className="card p-10 text-center text-slate-500 font-medium">Loading dashboard...</div>;
+  if (error) return <div className="text-red-700">{getErrorMessage(error)}</div>;
+  if (isPending && !data) {
+    return (
+      <div className="card min-h-[calc(100vh-11.5rem)]">
+        <PageLoader className="min-h-[calc(100vh-11.5rem)]" size="lg" />
+      </div>
+    );
+  }
 
   const account = data.primaryAccount;
   const quality = account?.quality_rating || '—';
 
+  const today = data.today || {};
   const metrics = [
-    { label: 'Sent', value: data.today.sent, icon: Send, color: '#3b82f6' },
-    { label: 'Delivered', value: data.today.delivered, icon: CheckCheck, color: '#25d366' },
-    { label: 'Read', value: data.today.read, icon: Eye, color: '#f59e0b' },
-    { label: 'Failed', value: data.today.failed, icon: XCircle, color: '#ef4444' },
-    { label: 'Pending', value: data.today.pending, icon: Clock3, color: '#94a3b8' },
+    { label: 'Sent', value: today.sent, icon: Send, color: '#3b82f6' },
+    { label: 'Delivered', value: today.delivered, icon: CheckCheck, color: '#25d366' },
+    { label: 'Read', value: today.read, icon: Eye, color: '#f59e0b' },
+    { label: 'Failed', value: today.failed, icon: XCircle, color: '#ef4444' },
+    { label: 'Pending', value: today.pending, icon: Clock3, color: '#94a3b8' },
   ];
 
   return (
@@ -79,7 +90,7 @@ export default function DashboardPage() {
           <div className="flex items-start justify-between">
             <div>
               <div className="text-xs font-bold uppercase tracking-wide text-slate-400">Wallet Balance</div>
-              <div className="mt-2 text-lg font-extrabold text-slate-900">₹{Number(data.wallet.balance || 0).toFixed(2)}</div>
+              <div className="mt-2 text-lg font-extrabold text-slate-900">₹{Number(data.wallet?.balance || 0).toFixed(2)}</div>
               <Link to="/wallet" className="btn btn-wa-soft mt-3 !py-1.5 !px-3 text-xs">Add Money</Link>
             </div>
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-[#fff7e8] text-amber-600"><Wallet size={18} /></div>
@@ -122,7 +133,7 @@ export default function DashboardPage() {
           <div className="font-extrabold text-slate-800">Recent Campaigns</div>
           <Link to="/campaigns" className="text-sm font-bold text-[var(--wa-deep)]">View All</Link>
         </div>
-        {data.recentCampaigns.length === 0 ? (
+        {(data.recentCampaigns || []).length === 0 ? (
           <div className="p-5"><EmptyState title="No campaigns yet" body="Create a campaign to start bulk messaging." /></div>
         ) : (
           <div className="overflow-x-auto">

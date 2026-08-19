@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { FolderOpen, Lock, Pencil, Plus, Share2, Trash2, Users, X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { api, getErrorMessage } from '../lib/api';
 import { PageShell, IconAction } from '../components/PageShell';
 import { useAuth } from '../context/AuthContext';
 import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
+import { PageLoader } from '../components/ui';
 
 function isSiteAdmin(person) {
   const role = String(person?.role || person?.user_role || '').toLowerCase();
@@ -47,7 +49,6 @@ function AccessBadge({ mode }) {
 
 export default function GroupsPage() {
   const { isAdmin } = useAuth();
-  const [groups, setGroups] = useState([]);
   const [groupName, setGroupName] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('ACTIVE');
@@ -63,9 +64,17 @@ export default function GroupsPage() {
   const [accessError, setAccessError] = useState('');
   const [saving, setSaving] = useState(false);
   const [accessSaving, setAccessSaving] = useState(false);
-  const [loading, setLoading] = useState(true);
   const accessGroupRef = useRef(null);
   accessGroupRef.current = accessGroup;
+
+  const { data: groups = [], isPending, refetch } = useQuery({
+    queryKey: ['contact-groups'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/contacts/groups/list');
+      return data.data || [];
+    },
+  });
+  const loading = isPending && groups.length === 0;
 
   const addableMembers = useMemo(() => asMemberList(shareable), [shareable]);
   const invitedMembers = useMemo(() => asMemberList(accessUsers), [accessUsers]);
@@ -74,21 +83,12 @@ export default function GroupsPage() {
   function canManageGroupMembers(group) {
     if (!group) return false;
     if (group.can_manage_access) return true;
-    // Non-admin owners can always add/remove site members (except admins).
     return Boolean(group.is_owner) && !isAdmin;
   }
 
   const load = useCallback(async () => {
-    const { data } = await api.get('/api/contacts/groups/list');
-    setGroups(data.data || []);
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    load()
-      .catch((err) => setError(getErrorMessage(err)))
-      .finally(() => setLoading(false));
-  }, [load]);
+    await refetch();
+  }, [refetch]);
 
   useWorkspaceRealtime(['groups'], async () => {
     try {
@@ -331,9 +331,7 @@ export default function GroupsPage() {
 
       <div className="card flex min-h-[calc(100vh-11.5rem)] flex-col overflow-hidden">
         {loading ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
-            Loading groups…
-          </div>
+          <PageLoader className="flex-1 min-h-[calc(100vh-11.5rem)]" size="lg" />
         ) : !groups.length ? (
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
             <div className="mb-4 grid h-16 w-16 place-items-center rounded-full bg-[#e8faf0]">

@@ -11,10 +11,18 @@ function persistSession({ user, accessToken, refreshToken }) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const raw = localStorage.getItem('user');
-    return raw ? JSON.parse(raw) : null;
+    try {
+      const raw = localStorage.getItem('user');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
   });
-  const [loading, setLoading] = useState(!!localStorage.getItem('accessToken'));
+  const [loading, setLoading] = useState(() => {
+    const token = localStorage.getItem('accessToken');
+    const cachedUser = localStorage.getItem('user');
+    return Boolean(token && !cachedUser);
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
@@ -23,7 +31,7 @@ export function AuthProvider({ children }) {
       return;
     }
     api
-      .get('/api/auth/me')
+      .get('/api/auth/me', { cache: false })
       .then((res) => {
         setUser(res.data.data.user);
         localStorage.setItem('user', JSON.stringify(res.data.data.user));

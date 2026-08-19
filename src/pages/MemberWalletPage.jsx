@@ -4,7 +4,7 @@ import { api, getErrorMessage } from '../lib/api';
 import { openRazorpayCheckout } from '../lib/razorpay';
 import { useAuth } from '../context/AuthContext';
 import { PageShell, DataTable } from '../components/PageShell';
-import { StatusBadge } from '../components/ui';
+import { StatusBadge, PageLoader } from '../components/ui';
 
 const PRESETS = [500, 1000, 2000, 5000, 10000];
 
@@ -244,7 +244,11 @@ export default function MemberWalletPage() {
   }
 
   if (!wallet) {
-    return <div className="card p-10 text-center text-slate-500">Loading wallet...</div>;
+    return (
+      <div className="card min-h-[calc(100vh-11.5rem)]">
+        <PageLoader className="min-h-[calc(100vh-11.5rem)]" size="lg" />
+      </div>
+    );
   }
 
   const txColumns = [

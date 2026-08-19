@@ -38,6 +38,27 @@ export function StatCard({ label, value, hint }) {
   );
 }
 
+export function PageLoader({ className = '', size = 'md' }) {
+  return (
+    <div
+      className={`grid place-items-center ${className}`}
+      role="status"
+      aria-label="Loading"
+    >
+      <div
+        className={`orbit-loader ${size === 'sm' ? 'orbit-loader--sm' : ''} ${
+          size === 'lg' ? 'orbit-loader--lg' : ''
+        }`}
+        aria-hidden="true"
+      >
+        {Array.from({ length: 8 }, (_, i) => (
+          <span key={i} style={{ '--i': i }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function EmptyState({ title, body }) {
   return (
     <div className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--panel-2)] p-8 text-center text-[var(--muted)]">

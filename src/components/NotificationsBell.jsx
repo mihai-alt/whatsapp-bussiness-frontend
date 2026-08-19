@@ -10,6 +10,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { useNotifications } from '../context/NotificationsContext';
+import { PageLoader } from './ui';
 
 function iconFor(type) {
   const t = String(type || '').toLowerCase();
@@ -132,7 +133,7 @@ export default function NotificationsBell() {
 
           <div className="max-h-[320px] overflow-y-auto">
             {loading && !items.length ? (
-              <div className="px-4 py-10 text-center text-sm text-[var(--muted)]">Loading…</div>
+              <PageLoader className="py-10" size="sm" />
             ) : !items.length ? (
               <div className="flex flex-col items-center px-6 py-12 text-center">
                 <div className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-[#e8faf0]">

@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { PageShell } from '../components/PageShell';
+import { PageLoader } from '../components/ui';
 
 export default function BusinessProfilePage() {
   const { isAdmin } = useAuth();
@@ -86,8 +87,8 @@ export default function BusinessProfilePage() {
   if (loadingAccounts) {
     return (
       <PageShell breadcrumb={[{ label: 'Home', to: '/' }, { label: 'Business Profile' }]}>
-        <div className="card flex min-h-[calc(100vh-11.5rem)] items-center justify-center text-sm text-slate-400">
-          Loading profile…
+        <div className="card min-h-[calc(100vh-11.5rem)]">
+          <PageLoader className="min-h-[calc(100vh-11.5rem)]" size="lg" />
         </div>
       </PageShell>
     );

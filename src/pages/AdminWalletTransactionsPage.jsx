@@ -4,7 +4,7 @@ import { Receipt, Search } from 'lucide-react';
 import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { Breadcrumb } from '../components/PageShell';
-import { StatusBadge } from '../components/ui';
+import { StatusBadge, PageLoader } from '../components/ui';
 
 function money(n) {
   return `₹${Number(n || 0).toLocaleString('en-IN', {
@@ -163,9 +163,7 @@ export default function AdminWalletTransactionsPage() {
         </div>
 
         {loading ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
-            Loading transactions…
-          </div>
+          <PageLoader className="flex-1 min-h-[calc(100vh-16rem)]" size="lg" />
         ) : !rows.length ? (
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
             <div className="mb-4 grid h-16 w-16 place-items-center rounded-full bg-[#e8faf0]">

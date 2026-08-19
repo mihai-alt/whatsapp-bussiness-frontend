@@ -4,7 +4,7 @@ import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { getSocket } from '../lib/socket';
 import { PageShell } from '../components/PageShell';
-import { StatusBadge, StatCard } from '../components/ui';
+import { StatusBadge, StatCard, PageLoader } from '../components/ui';
 
 function Donut({ segments }) {
   const total = Math.max(1, segments.reduce((s, x) => s + x.value, 0));
@@ -119,7 +119,13 @@ export default function CampaignDetailPage() {
   }, [campaign]);
 
   if (error && !campaign) return <div className="text-red-700">{error}</div>;
-  if (!campaign) return <div className="card p-10 text-center text-slate-500">Loading...</div>;
+  if (!campaign) {
+    return (
+      <div className="card min-h-[calc(100vh-11.5rem)]">
+        <PageLoader className="min-h-[calc(100vh-11.5rem)]" size="lg" />
+      </div>
+    );
+  }
 
   const done = Number(campaign.total_count || 0) - Number(campaign.pending_count || 0);
   const progress = campaign.total_count

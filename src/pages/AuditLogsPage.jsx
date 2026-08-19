@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { PageShell } from '../components/PageShell';
-import { EmptyState } from '../components/ui';
+import { EmptyState, PageLoader } from '../components/ui';
 
 function formatWhen(value) {
   if (!value) return '—';
@@ -46,7 +46,9 @@ export default function AuditLogsPage() {
       ) : null}
 
       {isLoading ? (
-        <div className="card p-10 text-center text-slate-500">Loading…</div>
+        <div className="card min-h-[calc(100vh-11.5rem)]">
+          <PageLoader className="min-h-[calc(100vh-11.5rem)]" size="lg" />
+        </div>
       ) : !rows.length ? (
         <EmptyState title="No audit events yet" body="Actions will appear here as your team uses the platform." />
       ) : (

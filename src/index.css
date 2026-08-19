@@ -84,6 +84,66 @@ body {
   min-height: 100vh;
 }
 
+/* Freelancer-style circular dots */
+.orbit-loader {
+  --orbit-n: 8;
+  --orbit-size: 3.35rem;
+  --orbit-dot: 0.52rem;
+  position: relative;
+  width: var(--orbit-size);
+  height: var(--orbit-size);
+  animation: orbit-spin 1.15s linear infinite;
+}
+
+.orbit-loader--sm {
+  --orbit-size: 1.85rem;
+  --orbit-dot: 0.34rem;
+}
+
+.orbit-loader--lg {
+  --orbit-size: 4.35rem;
+  --orbit-dot: 0.64rem;
+}
+
+.orbit-loader span {
+  position: absolute;
+  inset: 0;
+  transform: rotate(calc(var(--i) * 45deg));
+}
+
+.orbit-loader span::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--orbit-dot);
+  height: var(--orbit-dot);
+  margin-left: calc(var(--orbit-dot) / -2);
+  border-radius: 999px;
+  background: var(--wa);
+  box-shadow: 0 0 8px rgba(37, 211, 102, 0.45);
+  animation: orbit-pulse 0.95s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.118s);
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbit-pulse {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: scale(0.55);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /* Shared components                                                          */
 /* -------------------------------------------------------------------------- */

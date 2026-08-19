@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { BarChart3 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { api, getErrorMessage } from '../lib/api';
+import { PageLoader, StatCard } from '../components/ui';
 import { PageShell } from '../components/PageShell';
-import { StatCard } from '../components/ui';
 
 function AnalyticsChart({ points }) {
   const w = 640;
@@ -53,22 +54,17 @@ function AnalyticsChart({ points }) {
 }
 
 export default function ReportsPage() {
-  const [summary, setSummary] = useState(null);
-  const [daily, setDaily] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(true);
-    api
-      .get('/api/reports/messages')
-      .then((m) => {
-        setSummary(m.data.data.summary);
-        setDaily(m.data.data.daily || []);
-      })
-      .catch((err) => setError(getErrorMessage(err)))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data, isPending, error: queryError } = useQuery({
+    queryKey: ['reports-messages'],
+    queryFn: async () => {
+      const { data: res } = await api.get('/api/reports/messages');
+      return res.data;
+    },
+  });
+  const summary = data?.summary || null;
+  const daily = data?.daily || [];
+  const loading = isPending && !data;
+  const error = queryError ? getErrorMessage(queryError) : '';
 
   const points = useMemo(() => {
     const rows = daily.slice(-7);
@@ -102,9 +98,7 @@ export default function ReportsPage() {
 
       <div className="card flex min-h-[calc(100vh-11.5rem)] flex-col overflow-hidden">
         {loading ? (
-          <div className="flex flex-1 items-center justify-center text-sm text-slate-400">
-            Loading reports…
-          </div>
+          <PageLoader className="flex-1 min-h-[calc(100vh-11.5rem)]" size="lg" />
         ) : !summary || !hasActivity ? (
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
             <div className="mb-4 grid h-16 w-16 place-items-center rounded-full bg-[#e8faf0]">

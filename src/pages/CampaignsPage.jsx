@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Check, Eye, Pause, Play, Plus, Rocket, RotateCcw, Send, XCircle } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { PageShell, IconAction } from '../components/PageShell';
-import { StatusBadge } from '../components/ui';
+import { StatusBadge, PageLoader } from '../components/ui';
 import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
 
 function formatWhen(value) {
@@ -17,23 +18,21 @@ function formatWhen(value) {
 export default function CampaignsPage() {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const [campaigns, setCampaigns] = useState([]);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busyId, setBusyId] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: campaigns = [], isPending, refetch } = useQuery({
+    queryKey: ['campaigns'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/campaigns');
+      return data.data || [];
+    },
+  });
+  const loading = isPending && campaigns.length === 0;
 
   const load = useCallback(async () => {
-    const { data } = await api.get('/api/campaigns');
-    setCampaigns(data.data || []);
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    load()
-      .catch((err) => setError(getErrorMessage(err)))
-      .finally(() => setLoading(false));
-  }, [load]);
+    await refetch();
+  }, [refetch]);
 
   useWorkspaceRealtime(['campaigns'], () =>
     load().catch((err) => setError(getErrorMessage(err)))
@@ -78,10 +77,8 @@ export default function CampaignsPage() {
             <tbody className="h-full">
               {loading ? (
                 <tr className="h-full">
-                  <td colSpan={4} className="px-5 text-center text-slate-400 align-middle">
-                    <div className="flex min-h-[calc(100vh-16rem)] items-center justify-center">
-                      Loading campaigns…
-                    </div>
+                  <td colSpan={4} className="px-5 align-middle">
+                    <PageLoader className="min-h-[calc(100vh-16rem)]" size="lg" />
                   </td>
                 </tr>
               ) : campaigns.length ? (
