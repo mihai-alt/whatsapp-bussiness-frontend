@@ -91,8 +91,8 @@ export default function NotificationsBell() {
   }, [open]);
 
   useEffect(() => {
-    if (!open || unread === 0) return;
-    markAllRead();
+    if (!open || unread === 0) return undefined;
+    void markAllRead();
   }, [open, unread, markAllRead]);
 
   return (

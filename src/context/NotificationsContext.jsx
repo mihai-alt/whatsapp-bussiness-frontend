@@ -18,8 +18,10 @@ export function NotificationsProvider({ children }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const userId = user?.id || null;
+
   const refreshUnread = useCallback(async () => {
-    if (!user) {
+    if (!userId) {
       setUnread(0);
       return;
     }
@@ -29,10 +31,10 @@ export function NotificationsProvider({ children }) {
     } catch {
       /* ignore */
     }
-  }, [user]);
+  }, [userId]);
 
   const refreshItems = useCallback(async () => {
-    if (!user) {
+    if (!userId) {
       setItems([]);
       return;
     }
@@ -45,10 +47,10 @@ export function NotificationsProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [userId]);
 
   const markAllRead = useCallback(async () => {
-    if (!user) {
+    if (!userId) {
       setUnread(0);
       return;
     }
@@ -59,16 +61,16 @@ export function NotificationsProvider({ children }) {
     } catch {
       await refreshUnread();
     }
-  }, [user, refreshUnread]);
+  }, [userId, refreshUnread]);
 
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       setUnread(0);
       setItems([]);
       return undefined;
     }
-    refreshUnread();
-    refreshItems();
+    void refreshUnread();
+    void refreshItems();
     reauthSocket();
     const socket = getSocket();
     const onNotif = (n) => {
@@ -77,7 +79,7 @@ export function NotificationsProvider({ children }) {
     };
     socket.on('notification', onNotif);
     return () => socket.off('notification', onNotif);
-  }, [user, refreshUnread, refreshItems]);
+  }, [userId, refreshUnread, refreshItems]);
 
   const value = useMemo(
     () => ({ unread, items, loading, refreshUnread, refreshItems, markAllRead }),

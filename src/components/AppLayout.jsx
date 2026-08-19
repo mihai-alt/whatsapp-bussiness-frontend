@@ -80,7 +80,9 @@ export default function AppLayout() {
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  useEffect(() => refreshUnread(), [refreshUnread]);
+  useEffect(() => {
+    void refreshUnread();
+  }, [refreshUnread]);
 
   useEffect(() => startApiKeepAlive(), []);
 

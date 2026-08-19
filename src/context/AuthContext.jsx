@@ -3,6 +3,18 @@ import { api, clearAuthStorage } from '../lib/api';
 
 const AuthContext = createContext(null);
 
+function sameUser(a, b) {
+  if (a === b) return true;
+  if (!a || !b) return false;
+  return (
+    a.id === b.id &&
+    a.role === b.role &&
+    a.name === b.name &&
+    a.email === b.email &&
+    a.avatar_url === b.avatar_url
+  );
+}
+
 function persistSession({ user, accessToken, refreshToken }) {
   localStorage.setItem('accessToken', accessToken);
   localStorage.setItem('refreshToken', refreshToken);
@@ -33,8 +45,9 @@ export function AuthProvider({ children }) {
     api
       .get('/api/auth/me')
       .then((res) => {
-        setUser(res.data.data.user);
-        localStorage.setItem('user', JSON.stringify(res.data.data.user));
+        const next = res.data.data.user;
+        localStorage.setItem('user', JSON.stringify(next));
+        setUser((prev) => (sameUser(prev, next) ? prev : next));
       })
       .catch((err) => {
         if (err?.response?.status === 401) {
