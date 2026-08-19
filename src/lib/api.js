@@ -5,8 +5,6 @@ const API_URL = import.meta.env.VITE_API_URL || '';
 const GET_TTL_MS = 45_000;
 
 const getCache = new Map();
-const inflight = new Map();
-const rawAdapter = axios.defaults.adapter;
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -31,12 +29,24 @@ function requestKey(config) {
 }
 
 function shouldCacheGet(config) {
+  if (!config) return false;
   if (String(config.method || 'get').toLowerCase() !== 'get') return false;
   if (config.cache === false) return false;
   if (config.responseType && config.responseType !== 'json') return false;
   const url = String(config.url || '');
   if (url.includes('/notifications') || url.includes('/health')) return false;
   return true;
+}
+
+function cloneCached(hit, config) {
+  return {
+    data: structuredClone(hit.data),
+    status: 200,
+    statusText: 'OK',
+    headers: hit.headers || {},
+    config,
+    request: {},
+  };
 }
 
 export function clearApiGetCache() {
@@ -53,49 +63,21 @@ api.interceptors.request.use((config) => {
   const ttl = Number(config.cacheTtl ?? GET_TTL_MS);
   const hit = getCache.get(key);
   if (hit && Date.now() - hit.at < ttl) {
-    config.adapter = async () => ({
-      data: structuredClone(hit.data),
-      status: 200,
-      statusText: 'OK',
-      headers: hit.headers || {},
-      config,
-      request: {},
-    });
-    return config;
+    config.adapter = () => Promise.resolve(cloneCached(hit, config));
   }
-
-  const adapter = config.adapter || rawAdapter;
-  config.adapter = (cfg) => {
-    const reqKey = requestKey(cfg);
-    const cached = getCache.get(reqKey);
-    if (cached && Date.now() - cached.at < ttl) {
-      return Promise.resolve({
-        data: structuredClone(cached.data),
-        status: 200,
-        statusText: 'OK',
-        headers: cached.headers || {},
-        config: cfg,
-        request: {},
-      });
-    }
-    if (inflight.has(reqKey)) return inflight.get(reqKey);
-    const pending = Promise.resolve(adapter(cfg))
-      .then((res) => {
-        if (res.status >= 200 && res.status < 300) {
-          getCache.set(reqKey, { data: res.data, at: Date.now(), headers: res.headers });
-        }
-        return res;
-      })
-      .finally(() => inflight.delete(reqKey));
-    inflight.set(reqKey, pending);
-    return pending;
-  };
   return config;
 });
 
 api.interceptors.response.use(
   (res) => {
     const method = String(res.config?.method || 'get').toLowerCase();
+    if (method === 'get' && shouldCacheGet(res.config) && res.status >= 200 && res.status < 300) {
+      getCache.set(requestKey(res.config), {
+        data: res.data,
+        at: Date.now(),
+        headers: {},
+      });
+    }
     if (method !== 'get' && res.status >= 200 && res.status < 300) {
       clearApiGetCache();
       queryClient.invalidateQueries().catch(() => {});

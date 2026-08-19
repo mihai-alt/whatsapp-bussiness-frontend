@@ -15,7 +15,7 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { api, getErrorMessage } from '../lib/api';
+import { api } from '../lib/api';
 import { EmptyState, StatusBadge, PageLoader } from '../components/ui';
 import { PageShell } from '../components/PageShell';
 import { useWorkspaceRealtime } from '../hooks/useWorkspaceRealtime';
@@ -31,19 +31,29 @@ function Sparkline({ color = '#25d366' }) {
 
 export default function DashboardPage() {
   const queryClient = useQueryClient();
-  const { data, error, isPending } = useQuery({
+  const { data, error, isPending, refetch } = useQuery({
     queryKey: ['dashboard'],
     queryFn: async () => {
       const { data: res } = await api.get('/api/dashboard');
       return res.data;
     },
+    retry: 2,
   });
 
   useWorkspaceRealtime(['campaigns', 'contacts', 'groups', 'wallet'], () => {
     queryClient.invalidateQueries({ queryKey: ['dashboard'] });
   });
 
-  if (error) return <div className="text-red-700">{getErrorMessage(error)}</div>;
+  if (error && !data) {
+    return (
+      <div className="card flex min-h-[calc(100vh-11.5rem)] flex-col items-center justify-center px-6 text-center">
+        <p className="text-sm text-slate-500">Could not load dashboard. Please try again.</p>
+        <button type="button" className="btn btn-primary mt-4" onClick={() => refetch()}>
+          Retry
+        </button>
+      </div>
+    );
+  }
   if (isPending && !data) {
     return (
       <div className="card min-h-[calc(100vh-11.5rem)]">
