@@ -347,6 +347,7 @@ export default function UsersPage() {
                   {pageRows.map((u) => {
                     const created = formatCreatedAt(u.created_at);
                     const isSelf = Number(u.id) === Number(me?.id);
+                    const canEditRow = meIsPrimary || u.role !== 'admin' || isSelf;
                     return (
                       <tr key={u.id} className="border-t border-[var(--line)] hover:bg-slate-50/70">
                         <td className="px-5 py-3.5 align-middle">
@@ -376,14 +377,18 @@ export default function UsersPage() {
                           ) : null}
                         </td>
                         <td className="px-5 py-3.5 align-middle">
-                          <button
-                            type="button"
-                            title="Edit user"
-                            onClick={() => openEdit(u)}
-                            className="grid h-8 w-8 place-items-center rounded-md border border-[var(--line)] text-slate-500 transition hover:bg-slate-50 hover:text-[var(--wa-deep)]"
-                          >
-                            <Pencil size={15} />
-                          </button>
+                          {canEditRow ? (
+                            <button
+                              type="button"
+                              title="Edit user"
+                              onClick={() => openEdit(u)}
+                              className="grid h-8 w-8 place-items-center rounded-md border border-[var(--line)] text-slate-500 transition hover:bg-slate-50 hover:text-[var(--wa-deep)]"
+                            >
+                              <Pencil size={15} />
+                            </button>
+                          ) : (
+                            <span className="inline-block h-8 w-8" aria-hidden />
+                          )}
                         </td>
                       </tr>
                     );
