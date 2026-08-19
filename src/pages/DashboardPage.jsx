@@ -13,7 +13,7 @@ import {
   Users,
   FileText,
   PlusCircle,
-} from '../icons/shell';
+} from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchDashboard, queryKeys } from '../lib/queries';
 import { EmptyState, StatusBadge, PageLoader } from '../components/ui';

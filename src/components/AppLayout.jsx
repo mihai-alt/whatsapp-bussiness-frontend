@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, Suspense } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import {
   LayoutDashboard,
@@ -18,7 +18,7 @@ import {
   History,
   Receipt,
   ScrollText,
-} from '../icons/shell';
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsContext';
 import { BrandLockup } from './Brand';
@@ -28,7 +28,6 @@ import ThemeToggle from './ThemeToggle';
 import { startApiKeepAlive } from '../lib/api';
 import { prefetchRoute } from '../lib/queries';
 import ViewErrorBoundary from './ViewErrorBoundary';
-import { PageLoader } from './ui';
 
 function roleLabel(role) {
   if (role === 'admin') return 'Super Admin';
@@ -217,9 +216,7 @@ export default function AppLayout() {
 
         <main className="p-4 md:p-6">
           <ViewErrorBoundary key={location.pathname}>
-            <Suspense fallback={<PageLoader className="min-h-[calc(100vh-11.5rem)]" size="lg" />}>
-              <Outlet />
-            </Suspense>
+            <Outlet />
           </ViewErrorBoundary>
         </main>
       </div>
