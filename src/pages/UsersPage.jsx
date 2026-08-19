@@ -197,6 +197,11 @@ export default function UsersPage() {
   const lockRoleStatus =
     editingPrimaryAdmin ||
     (modal === 'edit' && editing?.role === 'admin' && !meIsPrimary);
+  const lockAdminPassword =
+    modal === 'edit' &&
+    editing?.role === 'admin' &&
+    !meIsPrimary &&
+    Number(editing?.id) !== Number(me?.id);
 
   function closeModal() {
     setModal(null);
@@ -234,7 +239,7 @@ export default function UsersPage() {
           payload.role = form.role;
           payload.is_active = form.is_active;
         }
-        if (form.password) payload.password = form.password;
+        if (form.password && !lockAdminPassword) payload.password = form.password;
         const { data } = await api.patch(`/api/auth/users/${editing.id}`, payload);
         applyUserUpdate(data.data.user);
         flash(true, 'User updated successfully');
@@ -476,13 +481,21 @@ export default function UsersPage() {
                 {modal === 'add' ? 'Password' : 'New Password (optional)'}
               </label>
               <input
-                className={fieldClass}
+                className={`${fieldClass} ${lockAdminPassword ? 'bg-slate-50 text-slate-500' : ''}`}
                 type="password"
-                value={form.password}
+                value={lockAdminPassword ? '' : form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 required={modal === 'add'}
+                disabled={lockAdminPassword}
                 minLength={modal === 'add' || form.password ? 8 : undefined}
-                placeholder={modal === 'edit' ? 'Leave blank to keep current' : ''}
+                placeholder={
+                  lockAdminPassword
+                    ? 'Only the first administrator can set this password'
+                    : modal === 'edit'
+                      ? 'Leave blank to keep current'
+                      : ''
+                }
+                autoComplete="new-password"
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -515,13 +528,14 @@ export default function UsersPage() {
                 </div>
               </div>
             </div>
-            {editingPrimaryAdmin ? (
+            {editingPrimaryAdmin && meIsPrimary ? (
               <p className="text-xs text-slate-500">
                 The first administrator&apos;s role and status cannot be changed.
               </p>
-            ) : lockRoleStatus ? (
+            ) : lockRoleStatus || lockAdminPassword ? (
               <p className="text-xs text-slate-500">
-                Only the first administrator can change another administrator&apos;s role or status.
+                Only the first administrator can change another administrator&apos;s role, status, or
+                password.
               </p>
             ) : null}
           </form>
