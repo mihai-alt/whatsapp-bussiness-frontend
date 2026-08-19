@@ -216,10 +216,9 @@ export default function GroupsPage() {
         userId: Number(grantUserId),
       });
       setAccessUsers(data.data.users || []);
+      setShareable(data.data.shareable || []);
+      setAccessGroup(data.data.group || accessGroup);
       setGrantUserId('');
-      const refreshed = await api.get(`/api/contacts/groups/${accessGroup.id}/access`);
-      setShareable(refreshed.data.data.shareable || []);
-      setAccessGroup(refreshed.data.data.group || accessGroup);
       await load();
     } catch (err) {
       setAccessError(getErrorMessage(err));
@@ -230,14 +229,14 @@ export default function GroupsPage() {
 
   async function grantAllMembers() {
     if (!accessGroup) return;
-    const ids = addableMembers.map((u) => Number(u.id)).filter(Boolean);
-    if (!ids.length) {
+    const remaining = addableMembers.length;
+    if (!remaining) {
       setAccessError('No members left to add');
       return;
     }
     if (
       !confirm(
-        `Add all ${ids.length} site member${ids.length === 1 ? '' : 's'} to this group? Admins will not be added.`
+        `Add all ${remaining} site member${remaining === 1 ? '' : 's'} to this group? Admins will not be added.`
       )
     ) {
       return;
@@ -245,23 +244,16 @@ export default function GroupsPage() {
     setAccessSaving(true);
     setAccessError('');
     try {
-      const failed = [];
-      for (const userId of ids) {
-        try {
-          await api.post(`/api/contacts/groups/${accessGroup.id}/access`, { userId });
-        } catch {
-          failed.push(userId);
-        }
-      }
+      const { data } = await api.post(`/api/contacts/groups/${accessGroup.id}/access/all`);
       setGrantUserId('');
-      const refreshed = await api.get(`/api/contacts/groups/${accessGroup.id}/access`);
-      setAccessUsers(refreshed.data.data.users || []);
-      setShareable(refreshed.data.data.shareable || []);
-      setAccessGroup(refreshed.data.data.group || accessGroup);
+      setAccessUsers(data.data.users || []);
+      setShareable(data.data.shareable || []);
+      setAccessGroup(data.data.group || accessGroup);
       await load();
-      if (failed.length) {
+      const skipped = data.data.skipped || [];
+      if (skipped.length) {
         setAccessError(
-          `Added members, but ${failed.length} could not be added. Admins cannot be added.`
+          `Added members, but ${skipped.length} could not be added. Admins cannot be added.`
         );
       }
     } catch (err) {
@@ -285,8 +277,8 @@ export default function GroupsPage() {
         `/api/contacts/groups/${accessGroup.id}/access/${userId}`
       );
       setAccessUsers(data.data.users || []);
-      const refreshed = await api.get(`/api/contacts/groups/${accessGroup.id}/access`);
-      setShareable(refreshed.data.data.shareable || []);
+      setShareable(data.data.shareable || []);
+      setAccessGroup(data.data.group || accessGroup);
       await load();
     } catch (err) {
       setAccessError(getErrorMessage(err));

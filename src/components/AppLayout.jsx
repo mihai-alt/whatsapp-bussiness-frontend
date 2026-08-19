@@ -159,20 +159,6 @@ export default function AppLayout() {
             <h1 className="text-xl font-extrabold tracking-tight text-[var(--ink)]">{pageTitle}</h1>
           </div>
 
-          <div className="mx-auto hidden min-w-0 max-w-xl flex-1 md:block">
-            <label className="relative block">
-              <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
-              <input
-                className="h-10 w-full rounded-full border border-[var(--line)] bg-[var(--header-search)] pl-10 pr-14 text-sm text-[var(--ink)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--wa)] focus:bg-[var(--panel)] focus:ring-2 focus:ring-[var(--wa)]/15"
-                placeholder="Search anything..."
-                aria-label="Search"
-              />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-[var(--line)] bg-[var(--panel)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--muted)]">
-                ⌘ K
-              </span>
-            </label>
-          </div>
-
           <div className="ml-auto flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
             <NotificationsBell />

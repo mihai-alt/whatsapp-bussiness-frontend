@@ -558,26 +558,26 @@ export default function NewCampaignPage() {
                   />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-slate-50/80 px-4 py-3">
+                  <div className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--soft)] px-4 py-3">
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#ecfdf5] text-[var(--wa-deep)]">
                       <Megaphone size={18} />
                     </span>
                     <div>
-                      <div className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                      <div className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
                         Campaign Goal
                       </div>
-                      <div className="text-sm font-bold text-slate-800">{goalLabel}</div>
+                      <div className="text-sm font-bold text-[var(--ink)]">{goalLabel}</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-slate-50/80 px-4 py-3">
+                  <div className="flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--soft)] px-4 py-3">
                     <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#ecfdf5] text-[var(--wa-deep)]">
                       <CalendarClock size={18} />
                     </span>
                     <div>
-                      <div className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                      <div className="text-xs font-bold uppercase tracking-wide text-[var(--muted)]">
                         Estimated Duration
                       </div>
-                      <div className="text-sm font-bold text-slate-800">Instant Delivery</div>
+                      <div className="text-sm font-bold text-[var(--ink)]">Instant Delivery</div>
                     </div>
                   </div>
                 </div>

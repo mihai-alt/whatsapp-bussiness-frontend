@@ -454,7 +454,7 @@ export default function AdminWalletPage() {
       {message ? <div className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{message}</div> : null}
 
       {wallet?.lowBalance ? (
-        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="notice notice-warn flex items-start gap-3">
           <AlertTriangle size={18} className="mt-0.5 shrink-0" />
           <div>
             <div className="font-bold">Low wallet balance</div>
@@ -569,10 +569,10 @@ export default function AdminWalletPage() {
                 <span className="text-slate-500">Total Deductions (Pending)</span>
                 <span className="font-bold text-amber-500">{money(wallet?.pendingDeductions)}</span>
               </div>
-              <div className="rounded-xl bg-emerald-50 px-3.5 py-3">
+              <div className="notice notice-ok !px-3.5 !py-3">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-bold text-emerald-800">Available Balance</span>
-                  <span className="font-extrabold text-emerald-700">{money(wallet?.availableBalance)}</span>
+                  <span className="font-bold">Available Balance</span>
+                  <span className="font-extrabold">{money(wallet?.availableBalance)}</span>
                 </div>
               </div>
             </div>

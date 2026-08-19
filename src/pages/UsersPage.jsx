@@ -317,10 +317,7 @@ export default function UsersPage() {
             <div className="text-base font-extrabold text-slate-900">No users found.</div>
             <p className="mt-1.5 max-w-md text-sm text-slate-500">
               Try adjusting search or filters, or add a new team member.
-            </p>
-            <button type="button" className="btn btn-primary mt-5 inline-flex" onClick={openAdd}>
-              <Plus size={16} /> Add User
-            </button>
+            </p>            
           </div>
         ) : (
           <>

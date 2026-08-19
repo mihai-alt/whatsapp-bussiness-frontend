@@ -135,7 +135,7 @@ function ConnectFlow({ open, onClose, metaConfig, signup }) {
             })}
           </ul>
         ) : (
-          <div className="rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 text-left text-sm text-sky-900">
+          <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-left text-sm text-sky-900">
             Make sure you are logged in to the correct Meta account.
           </div>
         )}
@@ -184,7 +184,7 @@ function ConnectFlow({ open, onClose, metaConfig, signup }) {
       </ul>
 
       {!metaConfig?.canLaunchSignup && !metaConfig?.embeddedSignupEnabled ? (
-        <div className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
+        <div className="notice notice-warn">
           <div className="font-bold">Meta Developer setup required</div>
           <p className="mt-1">
             Add <code className="font-mono">META_APP_ID</code>, <code className="font-mono">META_APP_SECRET</code>, and{' '}
@@ -194,7 +194,7 @@ function ConnectFlow({ open, onClose, metaConfig, signup }) {
         </div>
       ) : null}
 
-      {error ? <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+      {error ? <div className="notice notice-danger">{error}</div> : null}
 
       <button
         type="button"
