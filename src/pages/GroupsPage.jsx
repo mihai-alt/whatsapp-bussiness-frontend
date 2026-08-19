@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import { FolderOpen, Lock, Pencil, Plus, Share2, Trash2, Users, X } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { api, getErrorMessage } from '../lib/api';
@@ -50,6 +51,7 @@ function AccessBadge({ mode }) {
 
 export default function GroupsPage() {
   const { isAdmin } = useAuth();
+  const [searchParams] = useSearchParams();
   const [groupName, setGroupName] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('ACTIVE');
@@ -65,7 +67,9 @@ export default function GroupsPage() {
   const [accessError, setAccessError] = useState('');
   const [saving, setSaving] = useState(false);
   const [accessSaving, setAccessSaving] = useState(false);
+  const [focusGroupId, setFocusGroupId] = useState(0);
   const accessGroupRef = useRef(null);
+  const openedQueryRef = useRef('');
   accessGroupRef.current = accessGroup;
 
   const { data: groupData, isPending, refetch } = useQuery({
@@ -79,11 +83,14 @@ export default function GroupsPage() {
   const invitedMembers = useMemo(() => asMemberList(accessUsers), [accessUsers]);
   const invitedAdmins = useMemo(() => (accessUsers || []).filter(isSiteAdmin), [accessUsers]);
 
-  function canManageGroupMembers(group) {
-    if (!group) return false;
-    if (group.can_manage_access) return true;
-    return Boolean(group.is_owner) && !isAdmin;
-  }
+  const canManageGroupMembers = useCallback(
+    (group) => {
+      if (!group) return false;
+      if (group.can_manage_access) return true;
+      return Boolean(group.is_owner) && !isAdmin;
+    },
+    [isAdmin]
+  );
 
   const load = useCallback(async () => {
     await refetch();
@@ -173,21 +180,44 @@ export default function GroupsPage() {
     }
   }
 
-  async function openAccess(group) {
-    if (!canManageGroupMembers(group)) return;
-    setAccessError('');
-    setGrantUserId('');
-    setAccessGroup(group);
-    try {
-      const { data } = await api.get(`/api/contacts/groups/${group.id}/access`);
-      setAccessUsers(data.data.users || []);
-      setShareable(data.data.shareable || []);
-      setAccessGroup(data.data.group || group);
-    } catch (err) {
-      setError(getErrorMessage(err));
-      setAccessGroup(null);
+  const openAccess = useCallback(
+    async (group) => {
+      if (!canManageGroupMembers(group)) return;
+      setAccessError('');
+      setGrantUserId('');
+      setAccessGroup(group);
+      try {
+        const { data } = await api.get(`/api/contacts/groups/${group.id}/access`);
+        setAccessUsers(data.data.users || []);
+        setShareable(data.data.shareable || []);
+        setAccessGroup(data.data.group || group);
+      } catch (err) {
+        setError(getErrorMessage(err));
+        setAccessGroup(null);
+      }
+    },
+    [canManageGroupMembers]
+  );
+
+  useEffect(() => {
+    const groupId = String(searchParams.get('groupId') || '');
+    const token = `${groupId}:${searchParams.get('n') || ''}`;
+    if (!groupId || !groups.length) return;
+    if (openedQueryRef.current === token) return;
+    const group = groups.find((g) => String(g.id) === groupId);
+    if (!group) return;
+    openedQueryRef.current = token;
+    setFocusGroupId(Number(group.id));
+    requestAnimationFrame(() => {
+      document.getElementById(`group-row-${group.id}`)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    });
+    if (canManageGroupMembers(group)) {
+      void openAccess(group);
     }
-  }
+  }, [groups, searchParams, canManageGroupMembers, openAccess]);
 
   function closeAccess() {
     if (accessSaving) return;
@@ -360,7 +390,13 @@ export default function GroupsPage() {
               </thead>
               <tbody>
                 {groups.map((r) => (
-                  <tr key={r.id} className="border-t border-[var(--line)] hover:bg-slate-50/70">
+                  <tr
+                    key={r.id}
+                    id={`group-row-${r.id}`}
+                    className={`border-t border-[var(--line)] hover:bg-slate-50/70 ${
+                      Number(focusGroupId) === Number(r.id) ? 'bg-[#ecfdf5]' : ''
+                    }`}
+                  >
                     <td className="px-5 py-3.5 align-middle">
                       <div className="font-bold text-slate-800">{r.name}</div>
                       {r.description ? (

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import {
   CheckCircle2,
   Clock3,
@@ -148,6 +149,8 @@ function RowMenu({ row, onSubmit, onDelete, onView }) {
 }
 
 export default function TemplatesPage() {
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q') || '';
   const [templates, setTemplates] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [languages, setLanguages] = useState(LANGUAGES);
@@ -172,8 +175,8 @@ export default function TemplatesPage() {
   });
   const [total, setTotal] = useState(0);
   const [status, setStatus] = useState('');
-  const [search, setSearch] = useState('');
-  const [query, setQuery] = useState('');
+  const [search, setSearch] = useState(initialQuery);
+  const [query, setQuery] = useState(initialQuery);
   const [showCreate, setShowCreate] = useState(true);
   const [viewRow, setViewRow] = useState(null);
   const [error, setError] = useState('');

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import {
   AlertTriangle,
   Bell,
@@ -10,6 +11,7 @@ import {
   XCircle,
 } from '../lib/lucideIcons';
 import { useNotifications } from '../context/NotificationsContext';
+import { notificationHref } from '../lib/notificationLinks';
 import { PageLoader } from './ui';
 import SafeIcon from './SafeIcon';
 
@@ -149,11 +151,9 @@ export default function NotificationsBell() {
               <ul>
                 {items.map((n) => {
                   const { Icon, tone } = iconFor(n.type);
-                  return (
-                    <li
-                      key={n.id}
-                      className="flex cursor-default gap-3 border-b border-[var(--line)] px-4 py-3 last:border-b-0 hover:bg-[var(--panel-2)]"
-                    >
+                  const href = notificationHref(n);
+                  const inner = (
+                    <>
                       <div
                         className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-md ${tone}`}
                       >
@@ -171,6 +171,21 @@ export default function NotificationsBell() {
                         </div>
                         <div className="mt-1 text-[11px] text-[var(--faint)]">{timeAgo(n.created_at)}</div>
                       </div>
+                    </>
+                  );
+                  return (
+                    <li key={n.id} className="border-b border-[var(--line)] last:border-b-0">
+                      {href ? (
+                        <Link
+                          to={href}
+                          className="flex cursor-pointer gap-3 px-4 py-3 hover:bg-[var(--panel-2)]"
+                          onClick={() => setOpen(false)}
+                        >
+                          {inner}
+                        </Link>
+                      ) : (
+                        <div className="flex gap-3 px-4 py-3">{inner}</div>
+                      )}
                     </li>
                   );
                 })}
