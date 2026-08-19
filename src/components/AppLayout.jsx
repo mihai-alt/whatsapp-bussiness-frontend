@@ -31,9 +31,64 @@ import ViewErrorBoundary from './ViewErrorBoundary';
 import SafeIcon from './SafeIcon';
 
 function roleLabel(role) {
-  if (role === 'admin') return 'Super Admin';
+  if (role === 'admin') return 'Admin';
   if (role === 'member') return 'Member';
   return role || '';
+}
+
+function ReportsNav({ isAdmin, onNavigate, pathname, search }) {
+  const navigate = useNavigate();
+  const inReports = pathname.startsWith('/reports');
+  const [expanded, setExpanded] = useState(inReports);
+
+  useEffect(() => {
+    if (inReports) setExpanded(true);
+  }, [inReports]);
+
+  const items = [
+    { to: '/reports', label: 'Overview', end: true },
+    { to: '/reports/messages', label: 'Message Reports' },
+    { to: '/reports/campaigns', label: 'Campaign Reports' },
+    { to: '/reports/failed', label: 'Failed Messages' },
+    { to: '/reports/usage', label: 'Usage / Cost Reports' },
+    { to: '/reports/export', label: 'Export Reports' },
+  ];
+
+  return (
+    <div>
+      <button
+        type="button"
+        className={`nav-item w-full ${inReports ? 'nav-parent-open' : ''}`}
+        onClick={() => {
+          if (!inReports) {
+            setExpanded(true);
+            navigate({ pathname: '/reports', search });
+            onNavigate?.();
+            return;
+          }
+          setExpanded((v) => !v);
+        }}
+        onMouseEnter={() => prefetchRoute('/reports', isAdmin)}
+      >
+        <SafeIcon icon={BarChart3} size={18} />
+        <span className="flex-1 text-left">Reports</span>
+        <SafeIcon icon={ChevronDown} size={16} className={`transition ${expanded ? 'rotate-180' : ''}`} />
+      </button>
+      {expanded
+        ? items.map((item) => (
+            <NavLink
+              key={item.to}
+              to={{ pathname: item.to, search }}
+              end={item.end}
+              onClick={onNavigate}
+              className={({ isActive }) => `nav-item nav-subitem ${isActive ? 'active' : ''}`}
+            >
+              {item.label}
+            </NavLink>
+          ))
+        : null}
+    </div>
+  );
 }
 
 function SideLink({ to, end, label, isAdmin, onNavigate, children }) {
@@ -66,6 +121,11 @@ const titles = {
   '/admin/wallet/transactions': 'Transactions',
   '/admin/wallet/recharges': 'Recharge History',
   '/reports': 'Reports',
+  '/reports/messages': 'Message Reports',
+  '/reports/campaigns': 'Campaign Reports',
+  '/reports/failed': 'Failed Messages',
+  '/reports/usage': 'Usage / Cost Reports',
+  '/reports/export': 'Export Reports',
   '/settings': 'Settings',
   '/profile': 'Business Profile',
   '/users': 'Users',
@@ -92,6 +152,9 @@ export default function AppLayout() {
       !['/campaigns/new', '/campaigns/create'].includes(location.pathname)
     ) {
       return 'Campaign Progress';
+    }
+    if (location.pathname.startsWith('/reports/campaigns/') && location.pathname !== '/reports/campaigns') {
+      return 'Campaign Details';
     }
     return titles[location.pathname] || 'Dashboard';
   }, [location.pathname]);
@@ -145,9 +208,7 @@ export default function AppLayout() {
                 <SafeIcon icon={History} size={18} />
               </SideLink>
             ) : null}
-            <SideLink to="/reports" label="Reports" isAdmin={isAdmin} onNavigate={closeNav}>
-              <SafeIcon icon={BarChart3} size={18} />
-            </SideLink>
+            <ReportsNav isAdmin={isAdmin} onNavigate={closeNav} pathname={location.pathname} search={location.search} />
             <SideLink to="/settings" label="Settings" isAdmin={isAdmin} onNavigate={closeNav}>
               <SafeIcon icon={Settings} size={18} />
             </SideLink>

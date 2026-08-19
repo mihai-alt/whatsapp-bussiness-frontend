@@ -1,11 +1,21 @@
 import { api, unwrapApiData } from './api';
 import { queryClient } from './queryClient';
+import { fetchReportMeta, fetchReportOverview } from './reportApi';
+import { DEFAULT_REPORT_FILTERS } from '../components/reports/reportUtils';
 
 export const queryKeys = {
   dashboard: ['dashboard'],
   campaigns: ['campaigns'],
   groups: ['contact-groups'],
-  reports: ['reports-messages'],
+  reports: ['reports'],
+  reportsMeta: ['reports', 'meta'],
+  reportsOverview: (filters) => ['reports', 'overview', filters],
+  reportsPerformance: (filters) => ['reports', 'performance', filters],
+  reportsMessages: (filters) => ['reports', 'messages', filters],
+  reportsCampaigns: (filters) => ['reports', 'campaigns', filters],
+  reportsCampaign: (id) => ['reports', 'campaign', id],
+  reportsFailed: (filters) => ['reports', 'failed', filters],
+  reportsUsage: (filters) => ['reports', 'usage', filters],
   numbers: ['whatsapp-numbers'],
   templatesStats: ['templates-stats'],
   contacts: ['contacts'],
@@ -33,14 +43,20 @@ export async function fetchGroups() {
 }
 
 export async function fetchReports() {
-  return unwrapApiData(await api.get('/api/reports/messages'));
+  return fetchReportOverview(DEFAULT_REPORT_FILTERS);
 }
 
 const ROUTE_PREFETCH = {
   '/': [{ queryKey: queryKeys.dashboard, queryFn: fetchDashboard }],
   '/campaigns': [{ queryKey: queryKeys.campaigns, queryFn: fetchCampaigns }],
   '/groups': [{ queryKey: queryKeys.groups, queryFn: fetchGroups }],
-  '/reports': [{ queryKey: queryKeys.reports, queryFn: fetchReports }],
+  '/reports': [
+    { queryKey: queryKeys.reportsMeta, queryFn: fetchReportMeta },
+    {
+      queryKey: queryKeys.reportsOverview(DEFAULT_REPORT_FILTERS),
+      queryFn: () => fetchReportOverview(DEFAULT_REPORT_FILTERS),
+    },
+  ],
   '/whatsapp': [
     {
       queryKey: queryKeys.numbers,

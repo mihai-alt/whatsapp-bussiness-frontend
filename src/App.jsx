@@ -28,7 +28,13 @@ const WalletPage = lazy(() => import('./pages/WalletPage'));
 const AdminWalletPage = lazy(() => import('./pages/AdminWalletPage'));
 const AdminWalletTransactionsPage = lazy(() => import('./pages/AdminWalletTransactionsPage'));
 const AdminWalletRechargesPage = lazy(() => import('./pages/AdminWalletRechargesPage'));
-const ReportsPage = lazy(() => import('./pages/ReportsPage'));
+const ReportsOverview = lazy(() => import('./pages/reports/ReportsOverview'));
+const MessageReports = lazy(() => import('./pages/reports/MessageReports'));
+const CampaignReports = lazy(() => import('./pages/reports/CampaignReports'));
+const CampaignReportDetails = lazy(() => import('./pages/reports/CampaignDetails'));
+const FailedMessages = lazy(() => import('./pages/reports/FailedMessages'));
+const UsageReports = lazy(() => import('./pages/reports/UsageReports'));
+const ExportReports = lazy(() => import('./pages/reports/ExportReports'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const UsersPage = lazy(() => import('./pages/UsersPage'));
 const AuditLogsPage = lazy(() => import('./pages/AuditLogsPage'));
@@ -72,7 +78,13 @@ export default function App() {
                         <Route path="admin/wallet" element={<AdminWalletPage />} />
                         <Route path="admin/wallet/transactions" element={<AdminWalletTransactionsPage />} />
                         <Route path="admin/wallet/recharges" element={<AdminWalletRechargesPage />} />
-                        <Route path="reports" element={<ReportsPage />} />
+                        <Route path="reports" element={<ReportsOverview />} />
+                        <Route path="reports/messages" element={<MessageReports />} />
+                        <Route path="reports/campaigns" element={<CampaignReports />} />
+                        <Route path="reports/campaigns/:campaignId" element={<CampaignReportDetails />} />
+                        <Route path="reports/failed" element={<FailedMessages />} />
+                        <Route path="reports/usage" element={<UsageReports />} />
+                        <Route path="reports/export" element={<ExportReports />} />
                         <Route path="settings" element={<SettingsPage />} />
                         <Route path="users" element={<UsersPage />} />
                         <Route path="audit-logs" element={<AuditLogsPage />} />

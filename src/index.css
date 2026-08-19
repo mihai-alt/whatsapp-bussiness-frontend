@@ -387,6 +387,33 @@ html.dark .notice-ok {
   box-shadow: 0 8px 18px rgba(37, 211, 102, 0.25);
 }
 
+.nav-item.nav-parent-open {
+  background: rgba(37, 211, 102, 0.12);
+  color: #e2e8f0;
+}
+
+.nav-subitem {
+  display: flex;
+  align-items: center;
+  margin-left: 0.85rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.nav-subitem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+.nav-subitem.active {
+  background: var(--wa);
+  color: white;
+  box-shadow: 0 6px 14px rgba(37, 211, 102, 0.22);
+}
+
 .metric-tile {
   position: relative;
   padding: 1rem 1.1rem 1.15rem;
