@@ -190,6 +190,13 @@ export default function UsersPage() {
     modal === 'edit' &&
     editing &&
     (editing.is_primary_admin || Number(editing.id) === Number(users[0]?.id));
+  const meIsPrimary =
+    Boolean(me?.is_primary_admin) ||
+    Number(me?.id) === Number(users.find((u) => u.is_primary_admin)?.id) ||
+    (users.length > 0 && Number(me?.id) === Number(users[0]?.id));
+  const lockRoleStatus =
+    editingPrimaryAdmin ||
+    (modal === 'edit' && editing?.role === 'admin' && !meIsPrimary);
 
   function closeModal() {
     setModal(null);
@@ -223,8 +230,7 @@ export default function UsersPage() {
         const payload = {
           name: form.name.trim(),
         };
-        // First signup admin: role and status are immutable for everyone
-        if (!editingPrimaryAdmin) {
+        if (!lockRoleStatus) {
           payload.role = form.role;
           payload.is_active = form.is_active;
         }
@@ -484,10 +490,10 @@ export default function UsersPage() {
                 <label className="mb-1.5 block text-sm font-semibold text-slate-700">Role</label>
                 <div className="relative">
                   <select
-                    className={`${selectClass} ${editingPrimaryAdmin ? 'bg-slate-50 text-slate-500' : ''}`}
+                    className={`${selectClass} ${lockRoleStatus ? 'bg-slate-50 text-slate-500' : ''}`}
                     value={form.role}
                     onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    disabled={editingPrimaryAdmin}
+                    disabled={lockRoleStatus}
                   >
                     <option value="admin">Admin</option>
                     <option value="member">Member</option>
@@ -498,10 +504,10 @@ export default function UsersPage() {
                 <label className="mb-1.5 block text-sm font-semibold text-slate-700">Status</label>
                 <div className="relative">
                   <select
-                    className={`${selectClass} ${editingPrimaryAdmin ? 'bg-slate-50 text-slate-500' : ''}`}
+                    className={`${selectClass} ${lockRoleStatus ? 'bg-slate-50 text-slate-500' : ''}`}
                     value={form.is_active ? '1' : '0'}
                     onChange={(e) => setForm({ ...form, is_active: e.target.value === '1' })}
-                    disabled={editingPrimaryAdmin}
+                    disabled={lockRoleStatus}
                   >
                     <option value="1">Active</option>
                     <option value="0">Inactive</option>
@@ -512,6 +518,10 @@ export default function UsersPage() {
             {editingPrimaryAdmin ? (
               <p className="text-xs text-slate-500">
                 The first administrator&apos;s role and status cannot be changed.
+              </p>
+            ) : lockRoleStatus ? (
+              <p className="text-xs text-slate-500">
+                Only the first administrator can change another administrator&apos;s role or status.
               </p>
             ) : null}
           </form>
