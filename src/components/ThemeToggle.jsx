@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Moon, Sun } from '../lib/lucideIcons';
 import { useTheme } from '../context/ThemeContext';
+import SafeIcon from './SafeIcon';
 
 const THEME_DELAY_MS = 220;
 
@@ -67,9 +68,9 @@ export default function ThemeToggle({ className = '' }) {
     >
       <span className="theme-toggle__glow" aria-hidden />
       {isDarkIcon ? (
-        <Moon size={18} strokeWidth={1.75} className="theme-toggle__icon" />
+        <SafeIcon icon={Moon} size={18} strokeWidth={1.75} className="theme-toggle__icon" />
       ) : (
-        <Sun size={18} strokeWidth={1.75} className="theme-toggle__icon" />
+        <SafeIcon icon={Sun} size={18} strokeWidth={1.75} className="theme-toggle__icon" />
       )}
     </button>
   );

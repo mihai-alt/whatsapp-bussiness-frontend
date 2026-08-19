@@ -1,26 +1,28 @@
-export { default as LayoutDashboard } from 'lucide-react/dist/esm/icons/layout-dashboard.js';
-export { default as Users } from 'lucide-react/dist/esm/icons/users.js';
-export { default as FileText } from 'lucide-react/dist/esm/icons/file-text.js';
-export { default as Megaphone } from 'lucide-react/dist/esm/icons/megaphone.js';
-export { default as Wallet } from 'lucide-react/dist/esm/icons/wallet.js';
-export { default as BarChart3 } from 'lucide-react/dist/esm/icons/chart-column.js';
-export { default as Settings } from 'lucide-react/dist/esm/icons/settings.js';
-export { default as Phone } from 'lucide-react/dist/esm/icons/phone.js';
-export { default as Building2 } from 'lucide-react/dist/esm/icons/building-2.js';
-export { default as LogOut } from 'lucide-react/dist/esm/icons/log-out.js';
-export { default as Menu } from 'lucide-react/dist/esm/icons/menu.js';
-export { default as ChevronDown } from 'lucide-react/dist/esm/icons/chevron-down.js';
-export { default as FolderOpen } from 'lucide-react/dist/esm/icons/folder-open.js';
-export { default as UserRound } from 'lucide-react/dist/esm/icons/user-round.js';
-export { default as History } from 'lucide-react/dist/esm/icons/history.js';
-export { default as Receipt } from 'lucide-react/dist/esm/icons/receipt.js';
-export { default as ScrollText } from 'lucide-react/dist/esm/icons/scroll-text.js';
-export { default as Moon } from 'lucide-react/dist/esm/icons/moon.js';
-export { default as Sun } from 'lucide-react/dist/esm/icons/sun.js';
-export { default as Bell } from 'lucide-react/dist/esm/icons/bell.js';
-export { default as AlertTriangle } from 'lucide-react/dist/esm/icons/triangle-alert.js';
-export { default as CheckCircle2 } from 'lucide-react/dist/esm/icons/circle-check.js';
-export { default as FolderPlus } from 'lucide-react/dist/esm/icons/folder-plus.js';
-export { default as Info } from 'lucide-react/dist/esm/icons/info.js';
-export { default as UserPlus } from 'lucide-react/dist/esm/icons/user-plus.js';
-export { default as XCircle } from 'lucide-react/dist/esm/icons/x-circle.js';
+export {
+  AlertTriangle,
+  BarChart3,
+  Bell,
+  Building2,
+  CheckCircle2,
+  ChevronDown,
+  FileText,
+  FolderOpen,
+  FolderPlus,
+  History,
+  Info,
+  LayoutDashboard,
+  LogOut,
+  Megaphone,
+  Menu,
+  Moon,
+  Phone,
+  Receipt,
+  ScrollText,
+  Settings,
+  Sun,
+  UserPlus,
+  UserRound,
+  Users,
+  Wallet,
+  XCircle,
+} from './lucide';

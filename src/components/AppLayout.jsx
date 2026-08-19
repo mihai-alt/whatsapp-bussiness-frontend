@@ -28,6 +28,7 @@ import ThemeToggle from './ThemeToggle';
 import { startApiKeepAlive } from '../lib/api';
 import { prefetchRoute } from '../lib/queries';
 import ViewErrorBoundary from './ViewErrorBoundary';
+import SafeIcon from './SafeIcon';
 
 function roleLabel(role) {
   if (role === 'admin') return 'Super Admin';
@@ -109,53 +110,53 @@ export default function AppLayout() {
 
           <nav className="flex-1 overflow-y-auto p-3 space-y-1">
             <SideLink to="/" end label="Dashboard" isAdmin={isAdmin} onNavigate={closeNav}>
-              <LayoutDashboard size={18} />
+              <SafeIcon icon={LayoutDashboard} size={18} />
             </SideLink>
             <SideLink to="/whatsapp" label="Numbers" isAdmin={isAdmin} onNavigate={closeNav}>
-              <Phone size={18} />
+              <SafeIcon icon={Phone} size={18} />
             </SideLink>
             <SideLink to="/profile" label="Profile" isAdmin={isAdmin} onNavigate={closeNav}>
-              <Building2 size={18} />
+              <SafeIcon icon={Building2} size={18} />
             </SideLink>
             <SideLink to="/templates" label="Templates" isAdmin={isAdmin} onNavigate={closeNav}>
-              <FileText size={18} />
+              <SafeIcon icon={FileText} size={18} />
             </SideLink>
             <SideLink to="/contacts" label="Contacts" isAdmin={isAdmin} onNavigate={closeNav}>
-              <Users size={18} />
+              <SafeIcon icon={Users} size={18} />
             </SideLink>
             <SideLink to="/groups" label="Groups" isAdmin={isAdmin} onNavigate={closeNav}>
-              <FolderOpen size={18} />
+              <SafeIcon icon={FolderOpen} size={18} />
             </SideLink>
             <SideLink to="/campaigns" label="Campaigns" isAdmin={isAdmin} onNavigate={closeNav}>
-              <Megaphone size={18} />
+              <SafeIcon icon={Megaphone} size={18} />
             </SideLink>
             <SideLink to="/wallet" label="Wallet" isAdmin={isAdmin} onNavigate={closeNav}>
-              <Wallet size={18} />
+              <SafeIcon icon={Wallet} size={18} />
             </SideLink>
             {isAdmin ? (
               <SideLink to="/admin/wallet/transactions" label="Transactions" isAdmin={isAdmin} onNavigate={closeNav}>
-                <Receipt size={18} />
+                <SafeIcon icon={Receipt} size={18} />
               </SideLink>
             ) : null}
             {isAdmin ? (
               <SideLink to="/admin/wallet/recharges" label="Recharge History" isAdmin={isAdmin} onNavigate={closeNav}>
-                <History size={18} />
+                <SafeIcon icon={History} size={18} />
               </SideLink>
             ) : null}
             <SideLink to="/reports" label="Reports" isAdmin={isAdmin} onNavigate={closeNav}>
-              <BarChart3 size={18} />
+              <SafeIcon icon={BarChart3} size={18} />
             </SideLink>
             <SideLink to="/settings" label="Settings" isAdmin={isAdmin} onNavigate={closeNav}>
-              <Settings size={18} />
+              <SafeIcon icon={Settings} size={18} />
             </SideLink>
             {isAdmin ? (
               <SideLink to="/users" label="Users" isAdmin={isAdmin} onNavigate={closeNav}>
-                <UserRound size={18} />
+                <SafeIcon icon={UserRound} size={18} />
               </SideLink>
             ) : null}
             {isAdmin ? (
               <SideLink to="/audit-logs" label="Audit Logs" isAdmin={isAdmin} onNavigate={closeNav}>
-                <ScrollText size={18} />
+                <SafeIcon icon={ScrollText} size={18} />
               </SideLink>
             ) : null}
           </nav>
@@ -170,7 +171,7 @@ export default function AppLayout() {
                 <div className="truncate text-sm font-bold">{user?.name}</div>
                 <div className="text-xs text-slate-400">{roleLabel(user?.role)}</div>
               </div>
-              <ChevronDown size={16} className="text-slate-400" />
+              <SafeIcon icon={ChevronDown} size={16} className="text-slate-400" />
             </button>
             {menuOpen ? (
               <button
@@ -180,7 +181,7 @@ export default function AppLayout() {
                   navigate('/login');
                 }}
               >
-                <LogOut size={15} /> Logout
+                <SafeIcon icon={LogOut} size={15} /> Logout
               </button>
             ) : null}
           </div>
@@ -193,7 +194,7 @@ export default function AppLayout() {
         <header className="sticky top-0 z-20 flex items-center gap-4 border-b border-[var(--line)] bg-[var(--header)] px-4 py-3 md:px-6">
           <div className="flex shrink-0 items-center gap-3">
             <button className="btn btn-secondary !px-2.5" onClick={() => setOpen(true)}>
-              <Menu size={18} />
+              <SafeIcon icon={Menu} size={18} />
             </button>
             <h1 className="text-xl font-extrabold tracking-tight text-[var(--ink)]">{pageTitle}</h1>
           </div>
@@ -208,7 +209,7 @@ export default function AppLayout() {
                   <div className="text-sm font-bold text-[var(--ink)]">{user?.name}</div>
                   <div className="text-[11px] font-semibold text-[var(--muted)]">{roleLabel(user?.role)}</div>
                 </div>
-                <ChevronDown size={14} className="text-[var(--muted)]" />
+                <SafeIcon icon={ChevronDown} size={14} className="text-[var(--muted)]" />
               </div>
             </Link>
           </div>

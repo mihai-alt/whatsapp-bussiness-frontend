@@ -11,7 +11,7 @@ import {
 } from '../lib/lucideIcons';
 import { useNotifications } from '../context/NotificationsContext';
 import { PageLoader } from './ui';
-import { isIcon } from '../lib/isIcon';
+import SafeIcon from './SafeIcon';
 
 function iconFor(type) {
   const t = String(type || '').toLowerCase();
@@ -114,7 +114,7 @@ export default function NotificationsBell() {
         aria-label="Notifications"
         aria-expanded={open}
       >
-        <Bell size={18} />
+        <SafeIcon icon={Bell} size={18} />
         {unread > 0 ? (
           <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-red-500 px-1 text-[10px] font-extrabold leading-none text-white ring-2 ring-white">
             {unread > 99 ? '99+' : unread}
@@ -138,7 +138,7 @@ export default function NotificationsBell() {
             ) : !items.length ? (
               <div className="flex flex-col items-center px-6 py-12 text-center">
                 <div className="mb-3 grid h-12 w-12 place-items-center rounded-full bg-[#e8faf0]">
-                  <Bell size={20} className="text-[var(--wa)]" />
+                  <SafeIcon icon={Bell} size={20} className="text-[var(--wa)]" />
                 </div>
                 <div className="text-sm font-bold text-[var(--ink)]">No notifications yet</div>
                 <p className="mt-1 text-xs text-[var(--muted)]">
@@ -157,7 +157,7 @@ export default function NotificationsBell() {
                       <div
                         className={`mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-md ${tone}`}
                       >
-                        {isIcon(Icon) ? <Icon size={16} /> : null}
+                        <SafeIcon icon={Icon} size={16} />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="text-[13px] leading-snug text-[var(--ink-soft)]">
