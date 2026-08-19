@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router';
-import { History } from 'lucide-react';
+import { History } from '../icons/shell';
 import { api, getErrorMessage } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { PageShell } from '../components/PageShell';

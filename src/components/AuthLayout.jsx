@@ -1,15 +1,13 @@
 import { Link } from 'react-router';
 import {
   LayoutDashboard,
-  Phone,
   Users,
   FileText,
   Megaphone,
   BarChart3,
   Wallet,
   Settings,
-  MessageCircle,
-} from 'lucide-react';
+} from '../icons/shell';
 import { BrandLockup, WhatsAppMark } from './Brand';
 import ThemeToggle from './ThemeToggle';
 import { isIcon } from '../lib/isIcon';
