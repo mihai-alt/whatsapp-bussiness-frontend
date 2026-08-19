@@ -18,7 +18,7 @@ import {
   History,
   Receipt,
   ScrollText,
-} from 'lucide-react';
+} from '../lib/lucideIcons';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsContext';
 import { BrandLockup } from './Brand';

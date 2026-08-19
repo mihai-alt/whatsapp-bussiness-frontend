@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from '../lib/lucideIcons';
 import { useTheme } from '../context/ThemeContext';
 
 const THEME_DELAY_MS = 220;

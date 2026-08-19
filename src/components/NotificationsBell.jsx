@@ -8,7 +8,7 @@ import {
   Phone,
   UserPlus,
   XCircle,
-} from 'lucide-react';
+} from '../lib/lucideIcons';
 import { useNotifications } from '../context/NotificationsContext';
 import { PageLoader } from './ui';
 import { isIcon } from '../lib/isIcon';
